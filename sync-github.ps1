@@ -31,9 +31,10 @@ if (-not $status) {
     Write-Host "4. Committing changes ($nowStr)..." -ForegroundColor Yellow
     git commit -m "Auto sync: AI Token Quota & SQLite Vault snapshot ($nowStr)"
     
-    Write-Host "5. Pushing to GitHub (main branch)..." -ForegroundColor Yellow
+    Write-Host "5. Pushing to GitHub (main & gh-pages)..." -ForegroundColor Yellow
     git branch -M main
     git push -u origin main
+    git push origin main:gh-pages
 }
 
 Write-Host "========================================================" -ForegroundColor Cyan

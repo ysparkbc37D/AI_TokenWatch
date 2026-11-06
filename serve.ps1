@@ -113,13 +113,27 @@ function Update-CodexHistory {
 
 # Periodic jobs; each one decides itself whether it is due
 $script:dbNext = 0
+$script:gitNext = 0
 function Invoke-Background {
     try { Update-Antigravity } catch { Write-Host ("antigravity: " + $_.Exception.Message) -ForegroundColor DarkYellow }
     try { Update-CodexHistory } catch { Write-Host ("codex: " + $_.Exception.Message) -ForegroundColor DarkYellow }
     $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
     if ($now -ge $script:dbNext) {
-        $script:dbNext = $now + 180000
+        $script:dbNext = $now + 300000
         try { Export-StaticSnapshots } catch {}
+    }
+    if ($now -ge $script:gitNext) {
+        $script:gitNext = $now + 300000
+        try {
+            $status = git status --porcelain data/ 2>$null
+            if ($status) {
+                git add data/ 2>$null
+                $nowStr = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+                git commit -m "Auto sync: AI Token Quota & SQLite Vault snapshot ($nowStr)" 2>$null
+                git push origin main 2>$null
+                git push origin main:gh-pages 2>$null
+            }
+        } catch {}
     }
 }
 

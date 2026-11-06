@@ -81,6 +81,11 @@
       el('line', { class: 'grid-l', x1: pad.l, x2: W - pad.r, y1: y(v), y2: y(v) }, svg);
       el('text', { class: 'axis', x: pad.l - 8, y: y(v) + 3.5, 'text-anchor': 'end' }, svg).textContent = opts.yLabel ? opts.yLabel(v) : `${v}`;
     }
+    if (yMax === 100) {
+      const y80 = y(80);
+      el('line', { class: 'grid-warn', x1: pad.l, x2: W - pad.r, y1: y80, y2: y80 }, svg);
+      el('text', { class: 'axis-warn', x: W - pad.r, y: y80 - 4, 'text-anchor': 'end' }, svg).textContent = '80% 한도 주의';
+    }
     const maxTicks = W < 420 ? 3 : W < 650 ? 4 : (opts.ticks || 6);
     const ticks = Math.min(opts.ticks || 6, maxTicks);
     for (let i = 0; i <= ticks; i++) {
@@ -177,29 +182,36 @@
         if (pt.bridge) {
           dots[si].setAttribute('fill', '#0b1329');
           dots[si].setAttribute('stroke', s.color);
-          dots[si].setAttribute('stroke-width', '2');
+          dots[si].setAttribute('stroke-width', '2.5');
+          dots[si].setAttribute('r', '5');
         } else {
           dots[si].setAttribute('fill', s.color);
-          dots[si].setAttribute('stroke', '#070d1a');
-          dots[si].setAttribute('stroke-width', '2');
+          dots[si].setAttribute('stroke', '#ffffff');
+          dots[si].setAttribute('stroke-width', '2.5');
+          dots[si].setAttribute('r', '5.5');
         }
         dots[si].setAttribute('visibility', 'visible');
         const row = document.createElement('div');
         row.style.setProperty('--c', s.color);
-        row.innerHTML = '<i></i><span></span>';
-        const span = row.querySelector('span');
+        row.innerHTML = '<i class="tip-dot"></i><span class="tip-name"></span><span class="tip-val"></span>';
+        const spanName = row.querySelector('.tip-name');
+        const spanVal = row.querySelector('.tip-val');
+        spanName.textContent = s.name;
         if (pt.bridge) {
-          span.textContent = `${s.name} ~${Math.round(pt.v)}% (점선 연결)`;
+          spanVal.textContent = `~${Math.round(pt.v)}%`;
+          spanVal.title = '이전 기록과 점선 보간';
           row.style.opacity = '0.75';
         } else {
-          span.textContent = `${s.name} ${Math.round(pt.v)}%`;
+          spanVal.textContent = `${Math.round(pt.v)}%`;
         }
         tip.append(row);
       });
       tip.hidden = false;
       const tw = tip.offsetWidth;
       const left = (cx / W) * box.clientWidth;
-      tip.style.left = `${left + 14 + tw > box.clientWidth ? Math.max(0, left - tw - 14) : left + 14}px`;
+      let tipX = left + 14 + tw > box.clientWidth ? left - tw - 14 : left + 14;
+      tipX = Math.max(8, Math.min(box.clientWidth - tw - 8, tipX));
+      tip.style.left = `${tipX}px`;
     }
     svg.addEventListener('mousemove', handlePointer);
     svg.addEventListener('pointerdown', handlePointer);

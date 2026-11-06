@@ -29,7 +29,6 @@
     </div>
     <div class="chips">
       <button type="button" class="btn-pwa" id="pwaInstallBtn" hidden title="휴대폰 및 PC 홈 화면에 PWA 앱으로 설치">📲 앱 설치</button>
-      <button type="button" class="btn-remote" id="remoteBtn" title="원격 / 모바일 실시간 동기화 설정"><span class="remote-status-dot" id="remoteDot"></span><span>원격 설정</span></button>
       <span class="chip" id="chipClaude" data-kind="wait"><span class="dot"></span><span>Claude</span></span>
       <span class="chip" id="chipGpt" data-kind="wait"><span class="dot"></span><span>ChatGPT</span></span>
       <span class="chip" id="chipAg" data-kind="wait"><span class="dot"></span><span>Antigravity</span></span>
@@ -255,35 +254,6 @@
       </div>
     </section>
   </main>
-
-  <!-- 원격 / 모바일 동기화 모달 -->
-  <div class="modal-overlay" id="remoteModal" hidden>
-    <div class="modal-box">
-      <div class="modal-head">
-        <h3>🌐 원격 &amp; 모바일 실시간 동기화 설정</h3>
-        <button type="button" class="modal-close" id="remoteClose">&times;</button>
-      </div>
-      <div class="modal-body">
-        <p>외부 스마트폰이나 노트북에서 내 PC의 대시보드 서버(포트 8089)에 실시간으로 접속할 주소를 설정합니다.</p>
-        <label>
-          <b>원격 서버 주소 (API Base URL):</b>
-          <input type="url" id="remoteUrlInput" placeholder="예: http://192.168.0.15:8089 또는 Tailscale / Cloudflare 주소">
-        </label>
-        <p class="hint">
-          * <b>설정하지 않은 경우</b>: 깃허브 저장소(GitHub Pages)에 백업된 최신 스냅샷(<code>data/quota.json</code>)을 자동으로 조회합니다.<br>
-          * <b>집 안 Wi-Fi</b>: PC의 로컬 IP(<code>http://192.168.x.x:8089</code>) 입력<br>
-          * <b>외부 5G/LTE</b>: Tailscale 또는 Cloudflare Tunnel 무료 주소 입력
-        </p>
-        <p class="ai-ok" id="remoteOk" hidden></p>
-        <p class="ai-err" id="remoteErr" hidden></p>
-      </div>
-      <div class="modal-foot">
-        <button type="button" class="btn" id="remoteTestBtn">연결 테스트</button>
-        <button type="button" class="btn" id="remoteClearBtn">초기화</button>
-        <button type="button" class="btn primary" id="remoteSaveBtn">저장 적용</button>
-      </div>
-    </div>
-  </div>
 
   <footer class="foot">
     <span>Claude: Chrome 확장 1분 주기 · ChatGPT: Codex 기록 · Gemini: Antigravity 1분 주기 · 토큰: 로컬 Claude Code / Codex 기록 (숫자만)</span>

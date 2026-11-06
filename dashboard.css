@@ -24,6 +24,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { margin: 0; }
 body {
   min-height: 100vh;
@@ -479,103 +480,6 @@ body {
   border-color: #38bdf8;
   color: #fff;
   transform: translateY(-1px);
-}
-.btn-remote {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  color: var(--muted);
-  padding: 5px 11px;
-  border-radius: 8px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-remote:hover {
-  border-color: var(--gem);
-  color: var(--fg);
-}
-.remote-status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--dim);
-}
-.remote-status-dot.live { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
-.remote-status-dot.snapshot { background: var(--gem); }
-
-/* ---------- 원격 설정 모달 ---------- */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(4, 8, 17, 0.75);
-  backdrop-filter: blur(6px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 20px;
-}
-.modal-box {
-  background: var(--card);
-  border: 1px solid var(--border-h);
-  border-radius: 14px;
-  width: 100%;
-  max-width: 480px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.modal-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.modal-head h3 {
-  font-size: 17px;
-  font-weight: 700;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.modal-close {
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 22px;
-  cursor: pointer;
-}
-.modal-body {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  font-size: 13px;
-  color: var(--muted);
-}
-.modal-body input {
-  width: 100%;
-  background: #060b17;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  color: var(--fg);
-  font-family: inherit;
-  font-size: 13.5px;
-}
-.modal-body input:focus {
-  outline: none;
-  border-color: var(--gem);
-}
-.modal-foot {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 6px;
 }
 
 /* ---------- 알뜰 토큰 사용 지수 (Token Frugality Hub) ---------- */

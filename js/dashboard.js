@@ -693,6 +693,15 @@
   }
 
   // ---------- 서버 & 원격 PWA 통신 ----------
+  const staticFallbacks = {
+    '/api/quota': './data/quota.json',
+    '/api/history': './data/history.json',
+    '/api/history-ag': './data/history-ag.json',
+    '/api/history-cx': './data/history-cx.json',
+    '/api/tokens': './data/tokens.json',
+    '/api/vault': './data/vault_db.json'
+  };
+
   function getBaseApi() {
     const remote = store.get('td.remoteApi', '').trim();
     if (remote) return remote.replace(/\/+$/, '');
@@ -700,40 +709,29 @@
     return '';
   }
 
-  function setRemoteDot(status) {
-    const dot = $('#remoteDot');
-    if (!dot) return;
-    dot.className = `remote-status-dot ${status}`;
-    dot.title = status === 'live' ? '실시간 원격 서버 연결됨' : status === 'snapshot' ? '정적 데이터 스냅샷 로드됨' : '연결 대기';
-  }
-
   async function getJson(path) {
     const base = getBaseApi();
+    const isGhPages = !base && (location.hostname.endsWith('github.io') || location.hostname.includes('github.io'));
+
+    // 깃허브 Pages 등 정적 호스팅 환경에서는 정적 스냅샷 파일 즉시 로드
+    if (isGhPages && staticFallbacks[path]) {
+      try {
+        const rStatic = await fetch(staticFallbacks[path], { cache: 'no-store' });
+        if (rStatic.ok) return await rStatic.json();
+      } catch {}
+    }
+
     try {
       const url = base ? `${base}${path}` : path;
       const r = await fetch(url, { cache: 'no-store' });
-      if (r.ok) {
-        setRemoteDot('live');
-        return await r.json();
-      }
+      if (r.ok) return await r.json();
       throw new Error(`HTTP ${r.status}`);
     } catch (err) {
-      // Fallback to static ./data/*.json when on GitHub Pages or server offline
-      const staticFallbacks = {
-        '/api/quota': './data/quota.json',
-        '/api/history': './data/history.json',
-        '/api/history-ag': './data/history-ag.json',
-        '/api/history-cx': './data/history-cx.json',
-        '/api/tokens': './data/tokens.json',
-        '/api/vault': './data/vault_db.json'
-      };
+      // 로컬 서버 연결 실패 시 스냅샷 데이터로 자동 폴백
       if (staticFallbacks[path]) {
         try {
           const rStatic = await fetch(staticFallbacks[path], { cache: 'no-store' });
-          if (rStatic.ok) {
-            setRemoteDot('snapshot');
-            return await rStatic.json();
-          }
+          if (rStatic.ok) return await rStatic.json();
         } catch {}
       }
       throw err;
@@ -963,14 +961,14 @@
     if (clk) clk.textContent = new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' });
   };
 
-  // ---------- PWA 및 원격 모달 ----------
-  function initPwaAndRemote() {
+  // ---------- PWA 지원 (앱 설치 & 오프라인 캐시) ----------
+  function initPwa() {
     // 1. Service Worker 등록
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
       navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
 
-    // 2. PWA 설치 프롬프트
+    // 2. PWA 설치 프롬프트 (설치 가능한 환경에서만 버튼 표시)
     let deferredPrompt;
     const pwaBtn = $('#pwaInstallBtn');
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -990,69 +988,6 @@
         deferredPrompt = null;
       });
     }
-
-    // 3. 원격 설정 모달
-    const remoteBtn = $('#remoteBtn');
-    const remoteModal = $('#remoteModal');
-    const remoteClose = $('#remoteClose');
-    const remoteInput = $('#remoteUrlInput');
-    const remoteSave = $('#remoteSaveBtn');
-    const remoteClear = $('#remoteClearBtn');
-    const remoteTest = $('#remoteTestBtn');
-    const remoteOk = $('#remoteOk');
-    const remoteErr = $('#remoteErr');
-
-    if (remoteBtn && remoteModal) {
-      remoteBtn.addEventListener('click', () => {
-        remoteModal.hidden = false;
-        if (remoteInput) remoteInput.value = store.get('td.remoteApi', '');
-        if (remoteOk) remoteOk.hidden = true;
-        if (remoteErr) remoteErr.hidden = true;
-      });
-    }
-    if (remoteClose && remoteModal) {
-      remoteClose.addEventListener('click', () => { remoteModal.hidden = true; });
-    }
-    if (remoteSave) {
-      remoteSave.addEventListener('click', () => {
-        const val = remoteInput ? remoteInput.value.trim() : '';
-        if (val) store.set('td.remoteApi', val);
-        else store.del('td.remoteApi');
-        if (remoteOk) { remoteOk.textContent = '✓ 원격 설정이 저장되었습니다. 새로고침합니다.'; remoteOk.hidden = false; }
-        setTimeout(() => location.reload(), 600);
-      });
-    }
-    if (remoteClear) {
-      remoteClear.addEventListener('click', () => {
-        store.del('td.remoteApi');
-        if (remoteInput) remoteInput.value = '';
-        if (remoteOk) { remoteOk.textContent = '원격 주소가 초기화되었습니다. 기본 로컬/스냅샷을 사용합니다.'; remoteOk.hidden = false; }
-        setRemoteDot('snapshot');
-      });
-    }
-    if (remoteTest) {
-      remoteTest.addEventListener('click', async () => {
-        const url = remoteInput ? remoteInput.value.trim().replace(/\/+$/, '') : '';
-        if (!url) {
-          if (remoteErr) { remoteErr.textContent = '테스트할 원격 주소를 입력하세요.'; remoteErr.hidden = false; }
-          return;
-        }
-        if (remoteOk) remoteOk.hidden = true;
-        if (remoteErr) remoteErr.hidden = true;
-        remoteTest.disabled = true;
-        remoteTest.textContent = '테스트 중…';
-        try {
-          const r = await fetch(`${url}/api/quota`, { cache: 'no-store' });
-          if (!r.ok) throw new Error(`HTTP ${r.status}`);
-          if (remoteOk) { remoteOk.textContent = '✓ 원격 서버 연결 성공! 실시간 쿼터 데이터를 수신할 수 있습니다.'; remoteOk.hidden = false; }
-        } catch (e) {
-          if (remoteErr) { remoteErr.textContent = `연결 실패: ${e.message}. PC의 방화벽/포트포워딩 또는 주소를 확인하세요.`; remoteErr.hidden = false; }
-        } finally {
-          remoteTest.disabled = false;
-          remoteTest.textContent = '연결 테스트';
-        }
-      });
-    }
   }
 
   // ---------- 시작 ----------
@@ -1060,7 +995,7 @@
   if (srvEl) srvEl.textContent = `서버 ${API ? 'localhost:8089' : location.host}`;
   tick();
   initDefaultModels();
-  initPwaAndRemote();
+  initPwa();
   render(true);
   pollQuota();
   loadHistory();

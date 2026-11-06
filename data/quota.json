@@ -2,10 +2,10 @@
     "claude":  {
                    "fiveHourPct":  100,
                    "weeklyPct":  0,
-                   "fiveHourResetTime":  1794011400909,
+                   "fiveHourResetTime":  1794011400769,
                    "weeklyResetTime":  1794607200000,
                    "source":  "extension",
-                   "lastUpdated":  "2026-11-07T07:39:30.1490274+09:00"
+                   "lastUpdated":  "2026-11-07T07:41:30.0067142+09:00"
                },
     "gemini":  {
                    "fiveHourLeft":  92,
@@ -118,6 +118,6 @@
                                            "window":  "weekly"
                                        }
                                    ],
-                        "lastUpdated":  "2026-11-07T07:40:21.6277020+09:00"
+                        "lastUpdated":  "2026-11-07T07:42:03.8779543+09:00"
                     }
 }

@@ -739,13 +739,14 @@
   }
 
   async function pollQuota() {
-    let delay = 5000;
+    const isGhPages = !getBaseApi() && (location.hostname.endsWith('github.io') || location.hostname.includes('github.io'));
+    let delay = isGhPages ? 300000 : 30000;
     try {
       const q = await getJson('/api/quota');
       const changed = !S.quota || JSON.stringify(q.claude) !== JSON.stringify(S.quota.claude);
       S.quota = q; S.serverOk = true;
       if (changed) loadHistory();
-    } catch { S.serverOk = false; delay = 10000; }
+    } catch { S.serverOk = false; delay = isGhPages ? 300000 : 15000; }
     render();
     setTimeout(pollQuota, delay);
   }
@@ -1017,6 +1018,7 @@
   loadModels(false);
   bindCompanySeg();
   setInterval(tick, 15000);
-  setInterval(loadHistory, 60000);
-  setInterval(loadTokens, 120000);
+  const syncInterval = (!getBaseApi() && location.hostname.includes('github.io')) ? 300000 : 120000;
+  setInterval(loadHistory, syncInterval);
+  setInterval(loadTokens, syncInterval);
 })();

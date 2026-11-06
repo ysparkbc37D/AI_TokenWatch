@@ -62,9 +62,14 @@ Google Gemini · Anthropic Claude · OpenAI ChatGPT(Codex) 사용 한도와 토�
 ```
 * 포트: `http://localhost:8089`
 
-### 1-클릭 GitHub 동기화 (PC -> 모바일 반영)
+### 1-클릭 / 5분 자동 GitHub 동기화 (PC -> 모바일 반영)
+* **수동 1회 동기화**:
 ```powershell
 .\sync-github.ps1
+```
+* **5분 주기 자동 동기화 (백그라운드)**:
+```powershell
+.\auto-sync-5min.ps1
 ```
 최신 쿼터 상태와 SQLite DB 스냅샷을 깃허브에 자동 커밋 & 푸시하여 모바일 PWA에 즉시 반영합니다.
 

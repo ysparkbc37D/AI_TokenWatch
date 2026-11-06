@@ -1,0 +1,59 @@
+{
+  "name": "AI 토큰 관제 · LLM Quota Hub",
+  "short_name": "토큰관제",
+  "description": "Google Gemini, Anthropic Claude, OpenAI ChatGPT 실시간 토큰 및 쿼터 한도 관제 PWA",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#070d1a",
+  "theme_color": "#0b1329",
+  "orientation": "any",
+  "lang": "ko-KR",
+  "categories": ["productivity", "utilities", "developer"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Google Gemini 관제",
+      "short_name": "Gemini",
+      "url": "./gemini.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Anthropic Claude 관제",
+      "short_name": "Claude",
+      "url": "./claude.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "OpenAI ChatGPT 관제",
+      "short_name": "ChatGPT",
+      "url": "./chatgpt.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

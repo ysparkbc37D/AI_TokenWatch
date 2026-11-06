@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Anthropic Claude 상세 관제 - AI 토큰 관제</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0b1329">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="토큰관제">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body data-page="claude">
+  <header class="top">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 34 34" aria-hidden="true">
+        <defs><linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#fbbf24"/></linearGradient></defs>
+        <circle cx="17" cy="17" r="13" fill="none" stroke="#1d2b47" stroke-width="4"/>
+        <path d="M17 4a13 13 0 0 1 12.4 17" fill="none" stroke="url(#lg)" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <h1>Anthropic Claude 모델 상세 관제</h1>
+        <p>Chrome 확장 실시간 한도 · Claude Code 토큰 집계 · Antigravity Claude 모델</p>
+      </div>
+    </div>
+    <div class="chips">
+      <button type="button" class="btn-pwa" id="pwaInstallBtn" hidden title="PWA 앱 설치">📲 앱 설치</button>
+      <button type="button" class="btn-remote" id="remoteBtn" title="원격 동기화 설정"><span class="remote-status-dot" id="remoteDot"></span><span>원격 설정</span></button>
+      <span class="chip" id="chipClaude" data-kind="wait"><span class="dot"></span><span>Claude</span></span>
+      <span class="chip" id="chipServer" data-kind="wait"><span class="dot"></span><span>서버</span></span>
+      <span class="clock" id="clock"></span>
+    </div>
+  </header>
+
+  <nav class="nav-bar">
+    <a href="index.html" class="nav-tab" style="--tab-c: var(--violet)"><span class="tab-icon">📊</span><span class="tab-title">통합 대시보드</span><span class="tab-badge">5시간 · 주간 관제</span></a>
+    <a href="gemini.html" class="nav-tab" style="--tab-c: var(--gem)"><span class="tab-icon">🔵</span><span class="tab-title">Google Gemini</span><span class="tab-badge">상세 관제</span></a>
+    <a href="claude.html" class="nav-tab active" style="--tab-c: var(--claude)"><span class="tab-icon">🟠</span><span class="tab-title">Anthropic Claude</span><span class="tab-badge">상세 관제</span></a>
+    <a href="chatgpt.html" class="nav-tab" style="--tab-c: var(--gpt)"><span class="tab-icon">🟢</span><span class="tab-title">OpenAI ChatGPT</span><span class="tab-badge">상세 관제</span></a>
+  </nav>
+
+  <main>
+    <!-- 1행: Claude 전용 KPI 4개 -->
+    <section class="card kpi span-3" id="kpi1" style="--accent: var(--claude)">
+      <div class="kpi-label"><i></i>Claude · 5시간 세션 한도</div>
+      <div class="kpi-row"><div class="kpi-value">–</div><svg class="kpi-spark" aria-hidden="true"></svg></div>
+      <div class="kpi-sub">–</div>
+    </section>
+    <section class="card kpi span-3" id="kpi2" style="--accent: var(--claudeW)">
+      <div class="kpi-label"><i></i>Claude · 주간 모든 모델 한도</div>
+      <div class="kpi-row"><div class="kpi-value">–</div><svg class="kpi-spark" aria-hidden="true"></svg></div>
+      <div class="kpi-sub">–</div>
+    </section>
+    <section class="card kpi span-3" id="kpi3" style="--accent: #a78bfa">
+      <div class="kpi-label"><i></i>Antigravity · Claude 공유 쿼터</div>
+      <div class="kpi-row"><div class="kpi-value">–</div><svg class="kpi-spark" aria-hidden="true"></svg></div>
+      <div class="kpi-sub">–</div>
+    </section>
+    <section class="card kpi span-3" id="kpi4" style="--accent: #fbbf24">
+      <div class="kpi-label"><i></i>Claude 누적 토큰 (입력 환산)</div>
+      <div class="kpi-row"><div class="kpi-value">–</div><svg class="kpi-spark" aria-hidden="true"></svg></div>
+      <div class="kpi-sub">–</div>
+    </section>
+
+    <section class="card guide-setup span-12" id="guideSetup" hidden>
+      <div class="card-head"><h2>Claude 자동 동기화 연결</h2><span class="hint">한 번만 설정하면 1분마다 채워집니다</span></div>
+      <ol>
+        <li>Chrome 주소창에 <code>chrome://extensions</code> → 오른쪽 위 <b>개발자 모드</b> 켜기</li>
+        <li><b>압축해제된 확장 프로그램을 로드합니다</b> → <code>LLM-Token-Manager\chrome-extension</code> 폴더 선택</li>
+        <li>같은 Chrome 에서 claude.ai 에 로그인되어 있으면 1분 안에 채워집니다</li>
+      </ol>
+    </section>
+
+    <!-- 2행: Claude 추이 + 한도 현황 -->
+    <section class="card span-8">
+      <div class="card-head">
+        <h2>Claude 사용률 추이</h2>
+        <span class="hint">5시간 세션 및 주간 한도 실시간 사용률 %</span>
+        <div class="right">
+          <div class="seg" id="rangeSeg">
+            <button type="button" data-range="21600000">6시간</button>
+            <button type="button" data-range="86400000">24시간</button>
+            <button type="button" data-range="604800000">7일</button>
+          </div>
+        </div>
+      </div>
+      <div class="legend" id="trendLegend"></div>
+      <div class="chart trend" id="trend"><div class="tip" id="trendTip" hidden></div></div>
+      <p class="empty" id="trendEmpty" hidden>기록이 쌓이면 그려집니다 (서버가 1분 간격으로 저장)</p>
+    </section>
+
+    <section class="card span-4" id="limitsCard">
+      <div class="card-head">
+        <h2>Claude 한도 현황</h2>
+        <span class="hint">막대 위 흰 선 = 세션 경과 시간</span>
+      </div>
+      <div class="company-modules" id="companyModules"></div>
+    </section>
+
+    <!-- 3행: Claude 토큰 분석 -->
+    <section class="card span-4">
+      <div class="card-head">
+        <h2>Claude 모델별 비중</h2>
+        <div class="right">
+          <div class="seg" id="periodSeg">
+            <button type="button" data-period="7">주간</button>
+            <button type="button" data-period="30">월간</button>
+          </div>
+        </div>
+      </div>
+      <div class="donut-wrap">
+        <div class="donut" id="donut"></div>
+        <ul class="donut-legend" id="donutLegend"></ul>
+      </div>
+      <div class="stats" id="stats"></div>
+    </section>
+
+    <section class="card span-5">
+      <div class="card-head"><h2>일별 Claude 토큰</h2><span class="hint" id="barsHint">입력 환산 토큰 추이</span></div>
+      <div class="chart bars" id="bars"><div class="tip" id="barsTip" hidden></div></div>
+      <table class="tbl">
+        <thead><tr><th>모델</th><th>제공자</th><th class="num">답변</th><th class="num">입력 환산</th><th class="num">캐시</th></tr></thead>
+        <tbody id="modelRows"></tbody>
+      </table>
+    </section>
+
+    <section class="card span-3">
+      <div class="card-head"><h2>효율 & 프로젝트</h2></div>
+      <div class="rings" id="rings"></div>
+      <p class="sub-title">시간대별 사용 (기간 합계)</p>
+      <div class="heat" id="heat"></div>
+      <div class="heat-axis"><span>0시</span><span>6</span><span>12</span><span>18</span><span>23시</span></div>
+      <p class="sub-title" id="projTitle">주요 사용 프로젝트</p>
+      <ul class="donut-legend" id="projects" style="margin-top:6px"></ul>
+    </section>
+
+    <!-- 4행: Claude 스마트 가이드 -->
+    <section class="card span-12">
+      <div class="card-head"><h2>Claude 스마트 가이드 & 5시간 윈도우 전략</h2><span class="hint" id="tipsHint">Claude 사용 기록 기준 · 자동 진단</span></div>
+      <ul class="tips" id="tips"></ul>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>Anthropic Claude: Chrome 확장 프로그램 1분 동기화 · Claude Code 로컬 세션 집계</span>
+    <span id="serverAddr"></span>
+  </footer>
+
+  <script src="js/viz.js"></script>
+  <script src="js/analysis.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

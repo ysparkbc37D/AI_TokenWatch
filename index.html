@@ -2,12 +2,19 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>AI 토큰 관제</title>
-  <link rel="icon" href="icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0b1329">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="토큰관제">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
   <link rel="stylesheet" href="dashboard.css">
 </head>
-<body>
+<body data-page="all">
   <header class="top">
     <div class="brand">
       <svg class="logo" viewBox="0 0 34 34" aria-hidden="true">
@@ -16,11 +23,13 @@
         <path d="M17 4a13 13 0 0 1 12.4 17" fill="none" stroke="url(#lg)" stroke-width="4" stroke-linecap="round"/>
       </svg>
       <div>
-        <h1>AI 토큰 관제</h1>
-        <p>Claude · ChatGPT · Gemini 사용량 한눈에</p>
+        <h1>AI 토큰 관제 · 통합 대시보드</h1>
+        <p>5시간 세션 & 주간 한도 종합 관제 · Claude · ChatGPT · Gemini</p>
       </div>
     </div>
     <div class="chips">
+      <button type="button" class="btn-pwa" id="pwaInstallBtn" hidden title="휴대폰 및 PC 홈 화면에 PWA 앱으로 설치">📲 앱 설치</button>
+      <button type="button" class="btn-remote" id="remoteBtn" title="원격 / 모바일 실시간 동기화 설정"><span class="remote-status-dot" id="remoteDot"></span><span>원격 설정</span></button>
       <span class="chip" id="chipClaude" data-kind="wait"><span class="dot"></span><span>Claude</span></span>
       <span class="chip" id="chipGpt" data-kind="wait"><span class="dot"></span><span>ChatGPT</span></span>
       <span class="chip" id="chipAg" data-kind="wait"><span class="dot"></span><span>Antigravity</span></span>
@@ -29,25 +38,32 @@
     </div>
   </header>
 
+  <nav class="nav-bar">
+    <a href="index.html" class="nav-tab active" style="--tab-c: var(--violet)"><span class="tab-icon">📊</span><span class="tab-title">통합 대시보드</span><span class="tab-badge">5시간 · 주간 관제</span></a>
+    <a href="gemini.html" class="nav-tab" style="--tab-c: var(--gem)"><span class="tab-icon">🔵</span><span class="tab-title">Google Gemini</span><span class="tab-badge">Antigravity · 모델별</span></a>
+    <a href="claude.html" class="nav-tab" style="--tab-c: var(--claude)"><span class="tab-icon">🟠</span><span class="tab-title">Anthropic Claude</span><span class="tab-badge">웹 5h/주간 · Code</span></a>
+    <a href="chatgpt.html" class="nav-tab" style="--tab-c: var(--gpt)"><span class="tab-icon">🟢</span><span class="tab-title">OpenAI ChatGPT</span><span class="tab-badge">Codex 30일/5h · 토큰</span></a>
+  </nav>
+
   <main>
     <!-- 1행: KPI -->
     <section class="card kpi span-3" id="kpiClaude" style="--accent: var(--claude)">
-      <div class="kpi-label"><i></i>Claude · 5시간</div>
+      <div class="kpi-label"><i></i>Claude · 5시간 & 주간 세션</div>
       <div class="kpi-row"><div class="kpi-value">–</div><svg class="kpi-spark" aria-hidden="true"></svg></div>
       <div class="kpi-sub">–</div>
     </section>
     <section class="card kpi span-3" id="kpiGpt" style="--accent: var(--gpt)">
-      <div class="kpi-label"><i></i>ChatGPT · Codex</div>
+      <div class="kpi-label"><i></i>ChatGPT · Codex 5시간 & 30일</div>
       <div class="kpi-row"><div class="kpi-value">–</div><svg class="kpi-spark" aria-hidden="true"></svg></div>
       <div class="kpi-sub">–</div>
     </section>
     <section class="card kpi span-3" id="kpiAg" style="--accent: var(--gem)">
-      <div class="kpi-label"><i></i>Gemini · Antigravity</div>
+      <div class="kpi-label"><i></i>Gemini · 5시간 & 주간 공유</div>
       <div class="kpi-row"><div class="kpi-value">–</div><svg class="kpi-spark" aria-hidden="true"></svg></div>
       <div class="kpi-sub">–</div>
     </section>
     <section class="card kpi span-3" id="kpiTokens" style="--accent: var(--violet)">
-      <div class="kpi-label"><i></i>이번 주 토큰</div>
+      <div class="kpi-label"><i></i>이번 주 토큰 (3사 통합)</div>
       <div class="kpi-row"><div class="kpi-value">–</div><svg class="kpi-spark" aria-hidden="true"></svg></div>
       <div class="kpi-sub">–</div>
     </section>
@@ -64,8 +80,8 @@
     <!-- 2행: 추이 + 한도 -->
     <section class="card span-8">
       <div class="card-head">
-        <h2>사용률 추이</h2>
-        <span class="hint">한도 대비 사용 %</span>
+        <h2>5시간 & 주간 사용률 추이</h2>
+        <span class="hint">5시간 단기 세션 · 주간 공유 쿼터 실시간 비교</span>
         <div class="right">
           <div class="seg" id="rangeSeg">
             <button type="button" data-range="21600000">6시간</button>
@@ -79,9 +95,19 @@
       <p class="empty" id="trendEmpty" hidden>기록이 쌓이면 그려집니다 (서버가 1분 간격으로 저장)</p>
     </section>
 
-    <section class="card span-4">
-      <div class="card-head"><h2>한도 현황</h2><span class="hint">막대 위 흰 선 = 시간 경과</span></div>
-      <ul class="limits" id="limits"></ul>
+    <section class="card span-4" id="limitsCard">
+      <div class="card-head">
+        <h2>한도 현황</h2>
+        <div class="right">
+          <div class="seg seg-sm" id="companySeg">
+            <button type="button" data-company="all" aria-selected="true">전체</button>
+            <button type="button" data-company="gemini">Gemini</button>
+            <button type="button" data-company="claude">Claude</button>
+            <button type="button" data-company="gpt">ChatGPT</button>
+          </div>
+        </div>
+      </div>
+      <div class="company-modules" id="companyModules"></div>
     </section>
 
     <!-- 3행: 토큰 분석 -->
@@ -121,7 +147,88 @@
       <ul class="donut-legend" id="projects" style="margin-top:6px"></ul>
     </section>
 
-    <!-- 4행: 가이드 + AI -->
+    <!-- 4행: 알뜰 토큰 사용 지수 & 낭비 방지 허브 -->
+    <section class="card span-12 frugal-card" id="frugalSection">
+      <div class="frugal-head">
+        <div class="frugal-score-box">
+          <div class="frugal-circle">
+            <span class="frugal-score-num" id="frugalScoreNum">94</span>
+            <span class="frugal-score-lbl">알뜰 점수</span>
+          </div>
+          <div class="frugal-grade-box">
+            <h3><span id="frugalGradeTitle">초절약 마스터</span> <span class="frugal-badge grade-S" id="frugalBadge">S등급</span></h3>
+            <span class="hint" id="frugalSubDesc">프롬프트 캐시 적중률 및 모델 적정 분배 분석 완료</span>
+          </div>
+        </div>
+        <div class="frugal-pill-row">
+          <div class="frugal-pill">
+            <span>캐시 절약 토큰</span>
+            <b id="frugalSavedTokens">+3,850만</b>
+            <small>낭비 없는 무료 적중</small>
+          </div>
+          <div class="frugal-pill">
+            <span>예상 비용 절감</span>
+            <b id="frugalSavedCost">약 ₩161,000</b>
+            <small id="frugalSavedUsd">~$115.50</small>
+          </div>
+          <div class="frugal-pill">
+            <span>답변 1회당 입력</span>
+            <b id="frugalTurnTokens">3.4만 토큰</b>
+            <small id="frugalTurnStatus">슬림한 맥락 유지</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- 세부 4대 효율 지표 바 -->
+      <div class="frugal-bars">
+        <div class="f-bar-item">
+          <div class="f-bar-lbl"><span>💎 프롬프트 캐시 적중률 (35점)</span><b id="fBarCache">82%</b></div>
+          <div class="f-track"><div class="f-fill" id="fFillCache" style="width:82%; background:#38bdf8;"></div></div>
+        </div>
+        <div class="f-bar-item">
+          <div class="f-bar-lbl"><span>🎯 모델 적정 분배율 (30점)</span><b id="fBarModel">90%</b></div>
+          <div class="f-track"><div class="f-fill" id="fFillModel" style="width:90%; background:#34d399;"></div></div>
+        </div>
+        <div class="f-bar-item">
+          <div class="f-bar-lbl"><span>⚡ 컨텍스트 효율성 (20점)</span><b id="fBarContext">95%</b></div>
+          <div class="f-track"><div class="f-fill" id="fFillContext" style="width:95%; background:#a78bfa;"></div></div>
+        </div>
+        <div class="f-bar-item">
+          <div class="f-bar-lbl"><span>⏱️ 생산성 지속 활용도 (15점)</span><b id="fBarPacing">90%</b></div>
+          <div class="f-track"><div class="f-fill" id="fFillPacing" style="width:90%; background:#fbbf24;"></div></div>
+        </div>
+      </div>
+
+      <!-- 낭비 방지 진단 리스트 -->
+      <div class="frugal-alerts" id="frugalAlerts"></div>
+    </section>
+
+    <!-- 5행: 누적 데이터 & 월간 / 년간 영구 DB 비교 -->
+    <section class="card span-12 vault-section" id="vaultSection">
+      <div class="card-head">
+        <h2>누적 데이터 &amp; 월간 · 년간 비교 <span class="vault-badge">SQLite Vault 영구 보존</span></h2>
+        <span class="hint">PC 재부팅 후에도 로컬 DB에 영구 누적 기록 · 월별 증감율 및 패턴 비교</span>
+      </div>
+      <div class="vault-table-wrap">
+        <table class="vault-table">
+          <thead>
+            <tr>
+              <th>기록 기간</th>
+              <th>총 입력 환산 토큰</th>
+              <th>답변 수</th>
+              <th>프롬프트 캐시 읽기</th>
+              <th>제공자별 점유</th>
+              <th>주요 모델</th>
+            </tr>
+          </thead>
+          <tbody id="vaultRows">
+            <tr><td colspan="6" class="empty">누적 데이터베이스 집계 중…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 6행: 가이드 + AI -->
     <section class="card span-6">
       <div class="card-head"><h2>현명하게 쓰는 가이드</h2><span class="hint" id="tipsHint">내 사용 기록 기준 · 자동 분석</span></div>
       <ul class="tips" id="tips"></ul>
@@ -142,11 +249,41 @@
         </div>
         <details class="payload"><summary>보낼 내용 보기 (대화 내용 없이 숫자 요약만 전송)</summary><pre id="aiPayload"></pre></details>
         <p class="ai-note">무료 등급 요청은 Google 이 서비스 개선에 사용할 수 있습니다. 위 요약 외의 데이터는 보내지 않습니다.</p>
-        <p class="ai-err" id="aiErr"></p>
+        <p class="ai-ok" id="aiOk" hidden></p>
+        <p class="ai-err" id="aiErr" hidden></p>
         <div class="ai-out" id="aiOut"></div>
       </div>
     </section>
   </main>
+
+  <!-- 원격 / 모바일 동기화 모달 -->
+  <div class="modal-overlay" id="remoteModal" hidden>
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>🌐 원격 &amp; 모바일 실시간 동기화 설정</h3>
+        <button type="button" class="modal-close" id="remoteClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>외부 스마트폰이나 노트북에서 내 PC의 대시보드 서버(포트 8089)에 실시간으로 접속할 주소를 설정합니다.</p>
+        <label>
+          <b>원격 서버 주소 (API Base URL):</b>
+          <input type="url" id="remoteUrlInput" placeholder="예: http://192.168.0.15:8089 또는 Tailscale / Cloudflare 주소">
+        </label>
+        <p class="hint">
+          * <b>설정하지 않은 경우</b>: 깃허브 저장소(GitHub Pages)에 백업된 최신 스냅샷(<code>data/quota.json</code>)을 자동으로 조회합니다.<br>
+          * <b>집 안 Wi-Fi</b>: PC의 로컬 IP(<code>http://192.168.x.x:8089</code>) 입력<br>
+          * <b>외부 5G/LTE</b>: Tailscale 또는 Cloudflare Tunnel 무료 주소 입력
+        </p>
+        <p class="ai-ok" id="remoteOk" hidden></p>
+        <p class="ai-err" id="remoteErr" hidden></p>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn" id="remoteTestBtn">연결 테스트</button>
+        <button type="button" class="btn" id="remoteClearBtn">초기화</button>
+        <button type="button" class="btn primary" id="remoteSaveBtn">저장 적용</button>
+      </div>
+    </div>
+  </div>
 
   <footer class="foot">
     <span>Claude: Chrome 확장 1분 주기 · ChatGPT: Codex 기록 · Gemini: Antigravity 1분 주기 · 토큰: 로컬 Claude Code / Codex 기록 (숫자만)</span>

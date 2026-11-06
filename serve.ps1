@@ -17,11 +17,12 @@ $histFile = Join-Path $DataDir "quota_history.jsonl"
 $agHistFile = Join-Path $DataDir "quota_ag_history.jsonl"
 $cxHistFile = Join-Path $DataDir "quota_cx_history.jsonl"
 . (Join-Path $baseDir "tokens.ps1")
+. (Join-Path $baseDir "db.ps1")
 $listener = New-Object System.Net.HttpListener
 $prefix   = "http://localhost:$Port/"
 $listener.Prefixes.Add($prefix)
 
-$histMax       = 20000      # lines kept (about 2 weeks at one sample per minute)
+$histMax       = 500000     # keep records for years without truncation
 $histKeepAlive = 600000     # write an unchanged sample at most every 10 minutes
 $script:lastSample = $null
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -111,9 +112,15 @@ function Update-CodexHistory {
 }
 
 # Periodic jobs; each one decides itself whether it is due
+$script:dbNext = 0
 function Invoke-Background {
     try { Update-Antigravity } catch { Write-Host ("antigravity: " + $_.Exception.Message) -ForegroundColor DarkYellow }
     try { Update-CodexHistory } catch { Write-Host ("codex: " + $_.Exception.Message) -ForegroundColor DarkYellow }
+    $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    if ($now -ge $script:dbNext) {
+        $script:dbNext = $now + 180000
+        try { Export-StaticSnapshots } catch {}
+    }
 }
 
 function Get-HistoryJson([string]$file) {
@@ -142,10 +149,25 @@ function Find-AntigravityConn {
         $ports = @(Get-NetTCPConnection -OwningProcess $p.ProcessId -State Listen -ErrorAction SilentlyContinue |
             ForEach-Object { $_.LocalPort } | Sort-Object -Unique)
         foreach ($port in $ports) {
-            $conn = @{ url = "http://127.0.0.1:$port/exa.language_server_pb.LanguageServerService/GetUserStatus"; token = $m.Groups[1].Value }
-            if (Invoke-AntigravityStatus $conn) { return $conn }
+            $conn = @{
+                url             = "http://127.0.0.1:$port/exa.language_server_pb.LanguageServerService/GetUserStatus"
+                quotaSummaryUrl = "http://127.0.0.1:$port/exa.language_server_pb.LanguageServerService/RetrieveUserQuotaSummary"
+                token           = $m.Groups[1].Value
+            }
+            if (Invoke-AntigravityQuotaSummary $conn -or (Invoke-AntigravityStatus $conn)) { return $conn }
         }
     }
+    return $null
+}
+
+function Invoke-AntigravityQuotaSummary($conn) {
+    try {
+        $r = Invoke-WebRequest -UseBasicParsing -Method Post -Uri $conn.quotaSummaryUrl -TimeoutSec 2 `
+            -Headers @{ 'X-Codeium-Csrf-Token' = $conn.token; 'Connect-Protocol-Version' = '1' } `
+            -ContentType 'application/json' -Body '{}'
+        $j = [System.Text.Encoding]::UTF8.GetString($r.RawContentStream.ToArray()) | ConvertFrom-Json
+        if ($j.response.groups) { return $j.response }
+    } catch {}
     return $null
 }
 
@@ -165,15 +187,22 @@ function Update-Antigravity {
     if ($now -lt $script:agNext) { return }
     $script:agNext = $now + $agInterval
 
-    $status = $null
-    if ($script:agConn) { $status = Invoke-AntigravityStatus $script:agConn }
-    if (-not $status) {
+    $summary = $null
+    $status  = $null
+    if ($script:agConn) {
+        $summary = Invoke-AntigravityQuotaSummary $script:agConn
+        if (-not $summary) { $status = Invoke-AntigravityStatus $script:agConn }
+    }
+    if (-not $summary -and -not $status) {
         $script:agConn = Find-AntigravityConn
-        if ($script:agConn) { $status = Invoke-AntigravityStatus $script:agConn }
+        if ($script:agConn) {
+            $summary = Invoke-AntigravityQuotaSummary $script:agConn
+            if (-not $summary) { $status = Invoke-AntigravityStatus $script:agConn }
+        }
     }
 
     $state = Read-State
-    if (-not $status) {
+    if (-not $summary -and -not $status) {
         # Antigravity closed: keep the last values, just flag it
         if ($state.antigravity) {
             Set-Field $state.antigravity "running" $false
@@ -182,25 +211,64 @@ function Update-Antigravity {
         return
     }
 
-    # Models sharing one quota report the same (fraction, reset) pair: group them
-    $groups = [ordered]@{}
-    foreach ($cfg in @($status.userStatus.cascadeModelConfigData.clientModelConfigs)) {
-        $q = $cfg.quotaInfo
-        if ($null -eq $q) { continue }
-        $frac = if ($null -eq $q.remainingFraction) { 0 } else { [double]$q.remainingFraction }
-        $reset = $null
-        if ($q.resetTime) { try { $reset = ([DateTimeOffset]::Parse($q.resetTime)).ToUnixTimeMilliseconds() } catch {} }
-        $key = "$frac|$reset"
-        $base = ([string]$cfg.label -replace '\s*\([^)]*\)\s*$', '').Trim()
-        if (-not $groups.Contains($key)) { $groups[$key] = @{ names = New-Object System.Collections.ArrayList; left = [Math]::Round($frac * 100, 1); reset = $reset } }
-        if (-not $groups[$key].names.Contains($base)) { [void]$groups[$key].names.Add($base) }
+    $parsedGroups = @()
+    $models = @()
+    $plan = "Google AI Pro"
+    if ($status -and $status.userStatus.userTier.name) { $plan = [string]$status.userStatus.userTier.name }
+
+    if ($summary -and $summary.groups) {
+        foreach ($grp in $summary.groups) {
+            $bList = @()
+            foreach ($b in $grp.buckets) {
+                $frac = if ($null -eq $b.remainingFraction) { 0 } else { [double]$b.remainingFraction }
+                $reset = $null
+                if ($b.resetTime) { try { $reset = ([DateTimeOffset]::Parse($b.resetTime)).ToUnixTimeMilliseconds() } catch {} }
+                $leftPct = [Math]::Round($frac * 100, 1)
+                $bList += [pscustomobject]@{
+                    bucketId  = [string]$b.bucketId
+                    window    = [string]$b.window
+                    name      = [string]$b.displayName
+                    left      = $leftPct
+                    resetTime = $reset
+                }
+                $winLabel = if ($b.window -eq '5h') { '5h' } else { 'weekly' }
+                $models += [pscustomobject]@{
+                    names     = @("$($grp.displayName) ($winLabel)")
+                    left      = $leftPct
+                    resetTime = $reset
+                    group     = [string]$grp.displayName
+                    window    = [string]$b.window
+                }
+            }
+            $parsedGroups += [pscustomobject]@{
+                name        = [string]$grp.displayName
+                description = [string]$grp.description
+                buckets     = $bList
+            }
+        }
+    } elseif ($status) {
+        # Fallback to GetUserStatus
+        $groups = [ordered]@{}
+        foreach ($cfg in @($status.userStatus.cascadeModelConfigData.clientModelConfigs)) {
+            $q = $cfg.quotaInfo
+            if ($null -eq $q) { continue }
+            $frac = if ($null -eq $q.remainingFraction) { 0 } else { [double]$q.remainingFraction }
+            $reset = $null
+            if ($q.resetTime) { try { $reset = ([DateTimeOffset]::Parse($q.resetTime)).ToUnixTimeMilliseconds() } catch {} }
+            $key = "$frac|$reset"
+            $base = ([string]$cfg.label -replace '\s*\([^)]*\)\s*$', '').Trim()
+            if (-not $groups.Contains($key)) { $groups[$key] = @{ names = New-Object System.Collections.ArrayList; left = [Math]::Round($frac * 100, 1); reset = $reset } }
+            if (-not $groups[$key].names.Contains($base)) { [void]$groups[$key].names.Add($base) }
+        }
+        $models = @($groups.Values | Sort-Object { $_.left } | ForEach-Object {
+            [pscustomobject]@{ names = @($_.names); left = $_.left; resetTime = $_.reset }
+        })
     }
-    $models = @($groups.Values | Sort-Object { $_.left } | ForEach-Object {
-        [pscustomobject]@{ names = @($_.names); left = $_.left; resetTime = $_.reset }
-    })
+
     Set-Field $state "antigravity" ([pscustomobject]@{
         running     = $true
-        plan        = [string]$status.userStatus.userTier.name
+        plan        = $plan
+        groups      = $parsedGroups
         models      = $models
         lastUpdated = (Get-Date).ToString("o")
     })
@@ -215,15 +283,16 @@ $allowed = @{
 }
 
 $mimeTypes = @{
-    ".html" = "text/html; charset=utf-8"
-    ".htm"  = "text/html; charset=utf-8"
-    ".js"   = "application/javascript; charset=utf-8"
-    ".json" = "application/json; charset=utf-8"
-    ".css"  = "text/css; charset=utf-8"
-    ".png"  = "image/png"
-    ".jpg"  = "image/jpeg"
-    ".svg"  = "image/svg+xml"
-    ".ico"  = "image/x-icon"
+    ".html"        = "text/html; charset=utf-8"
+    ".htm"         = "text/html; charset=utf-8"
+    ".js"          = "application/javascript; charset=utf-8"
+    ".json"        = "application/json; charset=utf-8"
+    ".webmanifest" = "application/manifest+json; charset=utf-8"
+    ".css"         = "text/css; charset=utf-8"
+    ".png"         = "image/png"
+    ".jpg"         = "image/jpeg"
+    ".svg"         = "image/svg+xml"
+    ".ico"         = "image/x-icon"
 }
 
 try {
@@ -282,6 +351,18 @@ try {
             }
             elseif ($urlPath -eq "/api/tokens" -and $request.HttpMethod -eq "GET") {
                 Send-Json $response (Get-TokenReportJson)
+            }
+            elseif ($urlPath -eq "/api/vault" -and $request.HttpMethod -eq "GET") {
+                try { Sync-TokenDatabase } catch {}
+                if (Test-Path $vaultJsonFile) {
+                    Send-Json $response ([System.IO.File]::ReadAllText($vaultJsonFile, [System.Text.Encoding]::UTF8))
+                } else {
+                    Send-Json $response '{"months":{},"years":{}}'
+                }
+            }
+            elseif ($urlPath -eq "/api/export" -and $request.HttpMethod -eq "GET") {
+                try { Export-StaticSnapshots } catch {}
+                Send-Json $response '{"status":"ok","message":"snapshots and db exported"}'
             }
             elseif ($urlPath -eq "/api/quota" -and $request.HttpMethod -eq "POST") {
                 $reader = New-Object System.IO.StreamReader($request.InputStream, [System.Text.Encoding]::UTF8)

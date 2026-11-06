@@ -1,0 +1,123 @@
+{
+    "claude":  {
+                   "fiveHourPct":  63,
+                   "weeklyPct":  58,
+                   "fiveHourResetTime":  1794011400102,
+                   "weeklyResetTime":  1794002400102,
+                   "source":  "extension",
+                   "lastUpdated":  "2026-11-07T05:50:30.3155862+09:00"
+               },
+    "gemini":  {
+                   "fiveHourLeft":  92,
+                   "weeklyLeft":  53,
+                   "claudeGptWeeklyLeft":  50,
+                   "argonWeeklyLeft":  4
+               },
+    "antigravity":  {
+                        "running":  true,
+                        "plan":  "Google AI Pro",
+                        "groups":  [
+                                       {
+                                           "name":  "Gemini Models",
+                                           "description":  "Models within this group: Gemini Flash, Gemini Pro",
+                                           "buckets":  [
+                                                           {
+                                                               "bucketId":  "gemini-weekly",
+                                                               "window":  "weekly",
+                                                               "name":  "Weekly Limit Remaining",
+                                                               "left":  32,
+                                                               "resetTime":  1794139944000
+                                                           },
+                                                           {
+                                                               "bucketId":  "gemini-5h",
+                                                               "window":  "5h",
+                                                               "name":  "Five Hour Limit Remaining",
+                                                               "left":  90.7,
+                                                               "resetTime":  1794011793000
+                                                           }
+                                                       ]
+                                       },
+                                       {
+                                           "name":  "Claude and GPT models",
+                                           "description":  "Models within this group: Claude Opus, Claude Sonnet, GPT-OSS",
+                                           "buckets":  [
+                                                           {
+                                                               "bucketId":  "3p-weekly",
+                                                               "window":  "weekly",
+                                                               "name":  "Weekly Limit Remaining",
+                                                               "left":  49.6,
+                                                               "resetTime":  1794431978000
+                                                           },
+                                                           {
+                                                               "bucketId":  "3p-5h",
+                                                               "window":  "5h",
+                                                               "name":  "Five Hour Limit Remaining",
+                                                               "left":  100,
+                                                               "resetTime":  1794016152000
+                                                           }
+                                                       ]
+                                       },
+                                       {
+                                           "name":  "Gemini 4 Argon",
+                                           "description":  "For paid Pro plans, Argon quota is separate. Higher Argon quota (included as part of the larger Gemini quota bucket) is available on Ultra plans.",
+                                           "buckets":  [
+                                                           {
+                                                               "bucketId":  "gemini-argon-wtu-weekly",
+                                                               "window":  "weekly",
+                                                               "name":  "Gemini 4 Argon Weekly Limit",
+                                                               "left":  3.8,
+                                                               "resetTime":  1794139170000
+                                                           }
+                                                       ]
+                                       }
+                                   ],
+                        "models":  [
+                                       {
+                                           "names":  [
+                                                         "Gemini Models (weekly)"
+                                                     ],
+                                           "left":  32,
+                                           "resetTime":  1794139944000,
+                                           "group":  "Gemini Models",
+                                           "window":  "weekly"
+                                       },
+                                       {
+                                           "names":  [
+                                                         "Gemini Models (5h)"
+                                                     ],
+                                           "left":  90.7,
+                                           "resetTime":  1794011793000,
+                                           "group":  "Gemini Models",
+                                           "window":  "5h"
+                                       },
+                                       {
+                                           "names":  [
+                                                         "Claude and GPT models (weekly)"
+                                                     ],
+                                           "left":  49.6,
+                                           "resetTime":  1794431978000,
+                                           "group":  "Claude and GPT models",
+                                           "window":  "weekly"
+                                       },
+                                       {
+                                           "names":  [
+                                                         "Claude and GPT models (5h)"
+                                                     ],
+                                           "left":  100,
+                                           "resetTime":  1794016152000,
+                                           "group":  "Claude and GPT models",
+                                           "window":  "5h"
+                                       },
+                                       {
+                                           "names":  [
+                                                         "Gemini 4 Argon (weekly)"
+                                                     ],
+                                           "left":  3.8,
+                                           "resetTime":  1794139170000,
+                                           "group":  "Gemini 4 Argon",
+                                           "window":  "weekly"
+                                       }
+                                   ],
+                        "lastUpdated":  "2026-11-07T05:50:14.4242531+09:00"
+                    }
+}

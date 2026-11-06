@@ -4,6 +4,7 @@
 # Sources (numbers only - conversation text is never kept or sent anywhere):
 #   Claude Code : %USERPROFILE%\.claude\projects\**\*.jsonl   one "usage" block per reply
 #   Codex       : %USERPROFILE%\.codex\sessions\**\*.jsonl     running "total_token_usage" per session
+#   Antigravity : %USERPROFILE%\.gemini\antigravity\brain\**\transcript.jsonl
 #
 # Categories (all raw token counts):
 #   in  = new input   cw = cache write   cr = cache read   out = output
@@ -12,8 +13,9 @@
 # Each file is parsed once and cached by (length, last write time) in
 # quota_tokens_cache.json, so only files that changed are read again.
 
-$tokDays      = 100                 # look back this many days
+$tokDays      = 730                 # look back 2 years for long-term monthly/yearly DB
 $tokMemoMs    = 120000              # rebuild the report at most every 2 minutes
+if (-not $DataDir) { $DataDir = if ($PSScriptRoot) { $PSScriptRoot } else { "." } }
 $tokCacheFile = Join-Path $DataDir "quota_tokens_cache.json"
 $script:tokFiles   = $null          # path -> @{ len; mtime; rows = @{key=double[5]}; hours = @{key=double} }
 $script:tokMemo    = $null
@@ -31,6 +33,11 @@ $rxTotObj   = New-Object regex '"total_token_usage":\{([^}]*)\}', 'Compiled'
 $rxCxCached = New-Object regex '"cached_input_tokens":(\d+)', 'Compiled'
 $rxCxWrite  = New-Object regex '"cache_write_input_tokens":(\d+)', 'Compiled'
 $rxRateWin  = New-Object regex '"(primary|secondary)":\{"used_percent":([\d.]+),"window_minutes":(\d+),"resets_at":(\d+)', 'Compiled'
+$rxAgCr     = New-Object regex '"cache_read_tokens":(\d+)', 'Compiled'
+$rxAgTs     = New-Object regex '"created_at":"([^"]+)"', 'Compiled'
+$rxAgModel  = New-Object regex 'setting `Model Selection` from [^\s`]+ to (.+?)\.(?:\s*No need|\s*$|")', 'Compiled'
+$rxAgProj1  = New-Object regex '(?i)[a-z]:\\\\(?:[^"''\\\/]+\\\\)*(?:00\.Projects|02\.Projects|Projects)\\\\([^"''\\\\\/]+)', 'Compiled'
+$rxAgProj2  = New-Object regex '(?i)"(?:Path|DirectoryPath|CommandLine)":\s*"([a-z]:\\[^"]+)"', 'Compiled'
 $script:codexLimits = $null         # latest Codex rate limits seen in any log
 
 # Codex keeps its current log open for writing: open with full sharing so reading never fails
@@ -152,6 +159,52 @@ function Read-CodexLog([string]$path) {
     return @{ rows = $rows; hours = $hours; limits = $limits }
 }
 
+function Read-AntigravityLog([string]$path) {
+    $rows = @{}; $hours = @{}
+    $model = "Gemini 3.8 Flash"
+    $project = "(unknown)"
+    $reader = Open-SharedReader $path
+    try {
+    while ($null -ne ($line = $reader.ReadLine())) {
+        if ($project -eq "(unknown)") {
+            $m1 = $rxAgProj1.Match($line)
+            if ($m1.Success) {
+                $project = $m1.Groups[1].Value
+            } else {
+                $m2 = $rxAgProj2.Match($line)
+                if ($m2.Success) { $project = Get-ProjectName $m2.Groups[1].Value }
+            }
+        }
+        if ($line.Contains('"source":"USER_EXPLICIT"') -or $line.Contains('"type":"USER_INPUT"')) {
+            $mMod = $rxAgModel.Match($line)
+            if ($mMod.Success) {
+                $rawModel = $mMod.Groups[1].Value.Trim()
+                if ($rawModel -and -not $rawModel.Contains("`n") -and -not $rawModel.Contains("`r")) { $model = $rawModel }
+            }
+        }
+        if (-not $line.Contains('"input_tokens":')) { continue }
+        $mIn = $rxUsageIn.Match($line)
+        if (-not $mIn.Success) { continue }
+        $in = [double]$mIn.Groups[1].Value
+        $mCr = $rxAgCr.Match($line)
+        $cr = if ($mCr.Success) { [double]$mCr.Groups[1].Value } else { 0 }
+        $mOut = $rxUsageOut.Match($line)
+        $out = if ($mOut.Success) { [double]$mOut.Groups[1].Value } else { 0 }
+        $cw = 0
+
+        $mTs = $rxAgTs.Match($line)
+        if (-not $mTs.Success) { continue }
+        try { $stamp = [DateTimeOffset]::Parse($mTs.Groups[1].Value, [Globalization.CultureInfo]::InvariantCulture) } catch { continue }
+
+        $local = $stamp.LocalDateTime
+        $day = $local.ToString('yyyy-MM-dd')
+        Add-TokRow $rows "$day|antigravity|$model|$project" $in $cw $cr $out
+        Add-TokHour $hours "$day|$($local.Hour)|antigravity" (Get-Weighted $in $cw $cr $out)
+    }
+    } finally { $reader.Close() }
+    return @{ rows = $rows; hours = $hours; limits = $null }
+}
+
 function Read-TokCache {
     $files = @{}
     if (-not (Test-Path $tokCacheFile)) { return $files }
@@ -203,8 +256,9 @@ function Get-TokenReportJson {
 
     $since = (Get-Date).AddDays(-$tokDays)
     $sources = @(
-        @{ name = 'claude'; dir = (Join-Path $env:USERPROFILE '.claude\projects') },
-        @{ name = 'codex';  dir = (Join-Path $env:USERPROFILE '.codex\sessions') }
+        @{ name = 'claude';      dir = (Join-Path $env:USERPROFILE '.claude\projects');   filter = '*.jsonl' },
+        @{ name = 'codex';       dir = (Join-Path $env:USERPROFILE '.codex\sessions');    filter = '*.jsonl' },
+        @{ name = 'antigravity'; dir = (Join-Path $env:USERPROFILE '.gemini\antigravity\brain'); filter = 'transcript.jsonl' }
     )
     $seen = @{}
     $changed = $false
@@ -212,14 +266,16 @@ function Get-TokenReportJson {
     foreach ($src in $sources) {
         $count = 0
         if (Test-Path $src.dir) {
-            foreach ($f in (Get-ChildItem $src.dir -Recurse -Filter *.jsonl -File -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTime -ge $since })) {
+            foreach ($f in (Get-ChildItem $src.dir -Recurse -Filter $src.filter -File -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTime -ge $since })) {
                 $count++
                 $seen[$f.FullName] = $true
                 $e = $script:tokFiles[$f.FullName]
                 $mt = $f.LastWriteTimeUtc.Ticks
                 if ($e -and $e.len -eq $f.Length -and $e.mtime -eq $mt) { continue }
                 try {
-                    $parsed = if ($src.name -eq 'claude') { Read-ClaudeLog $f.FullName } else { Read-CodexLog $f.FullName }
+                    $parsed = if ($src.name -eq 'claude') { Read-ClaudeLog $f.FullName }
+                              elseif ($src.name -eq 'codex') { Read-CodexLog $f.FullName }
+                              else { Read-AntigravityLog $f.FullName }
                     $script:tokFiles[$f.FullName] = @{ len = $f.Length; mtime = $mt; rows = $parsed.rows; hours = $parsed.hours; limits = $parsed.limits }
                     $changed = $true
                 } catch {

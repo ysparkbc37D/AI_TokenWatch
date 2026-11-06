@@ -740,7 +740,7 @@
 
   async function pollQuota() {
     const isGhPages = !getBaseApi() && (location.hostname.endsWith('github.io') || location.hostname.includes('github.io'));
-    let delay = isGhPages ? 300000 : 30000;
+    let delay = isGhPages ? 600000 : 15000;
     try {
       const q = await getJson('/api/quota');
       const changed = !S.quota || JSON.stringify(q.claude) !== JSON.stringify(S.quota.claude);

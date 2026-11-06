@@ -119,11 +119,11 @@ function Invoke-Background {
     try { Update-CodexHistory } catch { Write-Host ("codex: " + $_.Exception.Message) -ForegroundColor DarkYellow }
     $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
     if ($now -ge $script:dbNext) {
-        $script:dbNext = $now + 300000
+        $script:dbNext = $now + 60000    # 로컬 스냅샷 1분 주기
         try { Export-StaticSnapshots } catch {}
     }
     if ($now -ge $script:gitNext) {
-        $script:gitNext = $now + 300000
+        $script:gitNext = $now + 1800000  # 깃허브 원격 동기화 30분 주기 (부하 최소화)
         try {
             $status = git status --porcelain data/ 2>$null
             if ($status) {

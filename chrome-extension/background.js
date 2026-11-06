@@ -70,11 +70,11 @@ async function syncNow() {
 }
 
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.alarms.create('quota-sync', { periodInMinutes: 5 });
+  chrome.alarms.create('quota-sync', { periodInMinutes: 1 });
   syncNow();
 });
 chrome.runtime.onStartup.addListener(() => {
-  chrome.alarms.create('quota-sync', { periodInMinutes: 5 });
+  chrome.alarms.create('quota-sync', { periodInMinutes: 1 });
   syncNow();
 });
 chrome.alarms.onAlarm.addListener((a) => { if (a.name === 'quota-sync') syncNow(); });

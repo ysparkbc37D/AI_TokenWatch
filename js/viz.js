@@ -81,7 +81,8 @@
       el('line', { class: 'grid-l', x1: pad.l, x2: W - pad.r, y1: y(v), y2: y(v) }, svg);
       el('text', { class: 'axis', x: pad.l - 8, y: y(v) + 3.5, 'text-anchor': 'end' }, svg).textContent = opts.yLabel ? opts.yLabel(v) : `${v}`;
     }
-    const ticks = opts.ticks || 6;
+    const maxTicks = W < 420 ? 3 : W < 650 ? 4 : (opts.ticks || 6);
+    const ticks = Math.min(opts.ticks || 6, maxTicks);
     for (let i = 0; i <= ticks; i++) {
       const t = t0 + ((t1 - t0) * i) / ticks;
       el('text', { class: 'axis', x: x(t), y: H - 6, 'text-anchor': i === 0 ? 'start' : i === ticks ? 'end' : 'middle' }, svg)
@@ -153,9 +154,11 @@
 
     const tip = opts.tip;
     if (!tip) return;
-    svg.addEventListener('mousemove', (ev) => {
+    function handlePointer(ev) {
+      const clientX = ev.clientX ?? (ev.touches && ev.touches[0] ? ev.touches[0].clientX : null);
+      if (clientX == null) return;
       const r = svg.getBoundingClientRect();
-      const px = ((ev.clientX - r.left) / r.width) * W;
+      const px = ((clientX - r.left) / r.width) * W;
       let i = Math.round(((px - pad.l) / iw) * (times.length - 1));
       i = Math.max(0, Math.min(times.length - 1, i));
       const any = series.some((s) => getSeriesPoint(s, i) != null);
@@ -197,8 +200,13 @@
       const tw = tip.offsetWidth;
       const left = (cx / W) * box.clientWidth;
       tip.style.left = `${left + 14 + tw > box.clientWidth ? Math.max(0, left - tw - 14) : left + 14}px`;
-    });
+    }
+    svg.addEventListener('mousemove', handlePointer);
+    svg.addEventListener('pointerdown', handlePointer);
+    svg.addEventListener('pointermove', handlePointer);
     svg.addEventListener('mouseleave', hide);
+    svg.addEventListener('pointerleave', hide);
+    svg.addEventListener('pointercancel', hide);
     function hide() {
       tip.hidden = true;
       cursor.setAttribute('visibility', 'hidden');

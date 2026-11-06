@@ -955,7 +955,21 @@
   if (prevAi && prevAi.text) showResult(prevAi);
 
   let resizeTimer = null;
-  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { renderTrend(); render(true); }, 150); });
+  function onLayoutChange() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      renderTrend();
+      render(true);
+    }, 80);
+  }
+  window.addEventListener('resize', onLayoutChange);
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(() => onLayoutChange());
+    const trendEl = $('#trend');
+    if (trendEl) ro.observe(trendEl);
+    const limitsCard = $('#limitsCard');
+    if (limitsCard) ro.observe(limitsCard);
+  }
   const tick = () => {
     const clk = $('#clock');
     if (clk) clk.textContent = new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' });

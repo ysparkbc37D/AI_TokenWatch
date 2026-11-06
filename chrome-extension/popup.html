@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Quota Sync</title>
+  <style>
+    body { width: 260px; font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; background: #11141c; color: #e2e8f0; margin: 0; padding: 14px; word-break: keep-all; }
+    h3 { margin: 0 0 6px; font-size: 14px; color: #38bdf8; }
+    p { margin: 0 0 10px; font-size: 11px; color: #94a3b8; line-height: 1.4; }
+    .btn { width: 100%; background: #2563eb; color: #fff; border: none; padding: 7px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+    .btn:hover { background: #1d4ed8; }
+    .status { margin-top: 8px; font-size: 11px; color: #94a3b8; text-align: center; line-height: 1.5; }
+    .ok { color: #4ade80; } .err { color: #f87171; }
+  </style>
+</head>
+<body>
+  <h3>⚡ AI Quota Sync Bridge</h3>
+  <p>1분마다 claude.ai 5시간/주간 사용량을 읽어 대시보드(localhost:8089)로 보냅니다.</p>
+  <button id="syncNowBtn" class="btn">지금 즉시 동기화</button>
+  <div class="status" id="statusText">불러오는 중...</div>
+  <script src="popup.js"></script>
+</body>
+</html>

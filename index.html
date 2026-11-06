@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 토큰 관제</title>
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 34 34" aria-hidden="true">
+        <defs><linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#a78bfa"/></linearGradient></defs>
+        <circle cx="17" cy="17" r="13" fill="none" stroke="#1d2b47" stroke-width="4"/>
+        <path d="M17 4a13 13 0 0 1 12.4 17" fill="none" stroke="url(#lg)" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <h1>AI 토큰 관제</h1>
+        <p>Claude · ChatGPT · Gemini 사용량 한눈에</p>
+      </div>
+    </div>
+    <div class="chips">
+      <span class="chip" id="chipClaude" data-kind="wait"><span class="dot"></span><span>Claude</span></span>
+      <span class="chip" id="chipGpt" data-kind="wait"><span class="dot"></span><span>ChatGPT</span></span>
+      <span class="chip" id="chipAg" data-kind="wait"><span class="dot"></span><span>Antigravity</span></span>
+      <span class="chip" id="chipServer" data-kind="wait"><span class="dot"></span><span>서버</span></span>
+      <span class="clock" id="clock"></span>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1행: KPI -->
+    <section class="card kpi span-3" id="kpiClaude" style="--accent: var(--claude)">
+      <div class="kpi-label"><i></i>Claude · 5시간</div>
+      <div class="kpi-row"><div class="kpi-value">–</div><svg class="kpi-spark" aria-hidden="true"></svg></div>
+      <div class="kpi-sub">–</div>
+    </section>
+    <section class="card kpi span-3" id="kpiGpt" style="--accent: var(--gpt)">
+      <div class="kpi-label"><i></i>ChatGPT · Codex</div>
+      <div class="kpi-row"><div class="kpi-value">–</div><svg class="kpi-spark" aria-hidden="true"></svg></div>
+      <div class="kpi-sub">–</div>
+    </section>
+    <section class="card kpi span-3" id="kpiAg" style="--accent: var(--gem)">
+      <div class="kpi-label"><i></i>Gemini · Antigravity</div>
+      <div class="kpi-row"><div class="kpi-value">–</div><svg class="kpi-spark" aria-hidden="true"></svg></div>
+      <div class="kpi-sub">–</div>
+    </section>
+    <section class="card kpi span-3" id="kpiTokens" style="--accent: var(--violet)">
+      <div class="kpi-label"><i></i>이번 주 토큰</div>
+      <div class="kpi-row"><div class="kpi-value">–</div><svg class="kpi-spark" aria-hidden="true"></svg></div>
+      <div class="kpi-sub">–</div>
+    </section>
+
+    <section class="card guide-setup span-12" id="guideSetup" hidden>
+      <div class="card-head"><h2>Claude 자동 동기화 연결</h2><span class="hint">한 번만 설정하면 1분마다 채워집니다</span></div>
+      <ol>
+        <li>Chrome 주소창에 <code>chrome://extensions</code> → 오른쪽 위 <b>개발자 모드</b> 켜기</li>
+        <li><b>압축해제된 확장 프로그램을 로드합니다</b> → <code>LLM-Token-Manager\chrome-extension</code> 폴더 선택</li>
+        <li>같은 Chrome 에서 claude.ai 에 로그인되어 있으면 1분 안에 채워집니다</li>
+      </ol>
+    </section>
+
+    <!-- 2행: 추이 + 한도 -->
+    <section class="card span-8">
+      <div class="card-head">
+        <h2>사용률 추이</h2>
+        <span class="hint">한도 대비 사용 %</span>
+        <div class="right">
+          <div class="seg" id="rangeSeg">
+            <button type="button" data-range="21600000">6시간</button>
+            <button type="button" data-range="86400000">24시간</button>
+            <button type="button" data-range="604800000">7일</button>
+          </div>
+        </div>
+      </div>
+      <div class="legend" id="trendLegend"></div>
+      <div class="chart trend" id="trend"><div class="tip" id="trendTip" hidden></div></div>
+      <p class="empty" id="trendEmpty" hidden>기록이 쌓이면 그려집니다 (서버가 1분 간격으로 저장)</p>
+    </section>
+
+    <section class="card span-4">
+      <div class="card-head"><h2>한도 현황</h2><span class="hint">막대 위 흰 선 = 시간 경과</span></div>
+      <ul class="limits" id="limits"></ul>
+    </section>
+
+    <!-- 3행: 토큰 분석 -->
+    <section class="card span-4">
+      <div class="card-head">
+        <h2>토큰 비중</h2>
+        <div class="right">
+          <div class="seg" id="periodSeg">
+            <button type="button" data-period="7">주간</button>
+            <button type="button" data-period="30">월간</button>
+          </div>
+        </div>
+      </div>
+      <div class="donut-wrap">
+        <div class="donut" id="donut"></div>
+        <ul class="donut-legend" id="donutLegend"></ul>
+      </div>
+      <div class="stats" id="stats"></div>
+    </section>
+
+    <section class="card span-5">
+      <div class="card-head"><h2>일별 토큰</h2><span class="hint" id="barsHint">입력 환산 · 제공자별</span></div>
+      <div class="chart bars" id="bars"><div class="tip" id="barsTip" hidden></div></div>
+      <table class="tbl">
+        <thead><tr><th>모델</th><th>제공자</th><th class="num">답변</th><th class="num">입력 환산</th><th class="num">캐시</th></tr></thead>
+        <tbody id="modelRows"></tbody>
+      </table>
+    </section>
+
+    <section class="card span-3">
+      <div class="card-head"><h2>효율</h2></div>
+      <div class="rings" id="rings"></div>
+      <p class="sub-title">시간대별 사용 (기간 합계)</p>
+      <div class="heat" id="heat"></div>
+      <div class="heat-axis"><span>0시</span><span>6</span><span>12</span><span>18</span><span>23시</span></div>
+      <p class="sub-title" id="projTitle">프로젝트</p>
+      <ul class="donut-legend" id="projects" style="margin-top:6px"></ul>
+    </section>
+
+    <!-- 4행: 가이드 + AI -->
+    <section class="card span-6">
+      <div class="card-head"><h2>현명하게 쓰는 가이드</h2><span class="hint" id="tipsHint">내 사용 기록 기준 · 자동 분석</span></div>
+      <ul class="tips" id="tips"></ul>
+    </section>
+
+    <section class="card span-6">
+      <div class="card-head"><h2>Gemini AI 분석</h2><span class="hint">무료 Gemini API 키로 맞춤 조언</span></div>
+      <div class="ai-form">
+        <div class="ai-row">
+          <input type="password" id="aiKey" placeholder="Gemini API 키 (AIza…)" autocomplete="off" spellcheck="false">
+          <button type="button" class="btn" id="aiKeySave">저장</button>
+          <button type="button" class="btn" id="aiKeyClear">삭제</button>
+        </div>
+        <p class="ai-note">키는 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>에서 무료로 받을 수 있습니다. 이 브라우저에만 저장되고 서버나 파일에는 남지 않습니다.</p>
+        <div class="ai-row">
+          <select id="aiModel"><option value="">키를 저장하면 모델 목록을 불러옵니다</option></select>
+          <button type="button" class="btn primary" id="aiRun">AI 분석 받기</button>
+        </div>
+        <details class="payload"><summary>보낼 내용 보기 (대화 내용 없이 숫자 요약만 전송)</summary><pre id="aiPayload"></pre></details>
+        <p class="ai-note">무료 등급 요청은 Google 이 서비스 개선에 사용할 수 있습니다. 위 요약 외의 데이터는 보내지 않습니다.</p>
+        <p class="ai-err" id="aiErr"></p>
+        <div class="ai-out" id="aiOut"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>Claude: Chrome 확장 1분 주기 · ChatGPT: Codex 기록 · Gemini: Antigravity 1분 주기 · 토큰: 로컬 Claude Code / Codex 기록 (숫자만)</span>
+    <span id="serverAddr"></span>
+  </footer>
+
+  <script src="js/viz.js"></script>
+  <script src="js/analysis.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

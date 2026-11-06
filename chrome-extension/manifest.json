@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "AI Quota Live Sync Bridge",
+  "version": "1.2.0",
+  "description": "Claude.ai 사용 한도(5시간/주간)를 로컬 대시보드(localhost:8089)로 자동 전송합니다.",
+  "permissions": ["storage", "alarms"],
+  "host_permissions": [
+    "https://claude.ai/*",
+    "http://localhost:8089/*"
+  ],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_popup": "popup.html", "default_title": "AI Quota Sync" },
+  "content_scripts": [
+    { "matches": ["https://claude.ai/*"], "js": ["content.js"], "run_at": "document_idle" }
+  ]
+}

@@ -1,0 +1,11 @@
+# 실행 중 서버가 만드는 개인 사용량 데이터 — 절대 커밋하지 않는다
+quota_*.json
+quota_*.jsonl
+
+# build-exe.ps1 로 다시 만들 수 있는 산출물
+TokenDashboard.exe
+icon.ico
+
+# 개인 바로 가기 · 편집기 메타데이터
+*.lnk
+.claude/

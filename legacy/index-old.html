@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>(이전 화면) AI 모델 계정 한도 (Claude · Gemini · GPT)</title>
+  
+  <!-- Tailwind CSS & Font Awesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#0f1117] text-slate-100 min-h-screen flex flex-col font-sans selection:bg-blue-600 selection:text-white">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-[#161922]/90 backdrop-blur sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      
+      <!-- Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+          <i class="fa-solid fa-gauge-high text-sm"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-bold text-white tracking-tight">AI 모델 계정 한도 실시간 모니터</h1>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> 실시간 추적 중
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400">Claude 5시간/주간 제한 · Gemini 5h/Weekly Limit 통합 관제</p>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="flex items-center gap-2.5">
+        <button onclick="window.quotaApp.toggleSoundNotification()" id="soundAlertBtn"
+          class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700/80 text-xs text-slate-300 hover:text-white transition flex items-center gap-1.5">
+          <i class="fa-solid fa-bell text-amber-400" id="soundAlertIcon"></i>
+          <span class="hidden sm:inline">리셋 알림</span>
+        </button>
+
+        <button onclick="window.quotaApp.openSyncModal()" 
+          class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-md shadow-blue-500/20 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-sliders"></i>
+          <span>한도 / 연동 설정</span>
+        </button>
+
+        <button onclick="document.getElementById('autoSyncGuideModal').classList.remove('hidden')" 
+          class="px-3.5 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600 border border-indigo-500/40 text-indigo-300 hover:text-white font-semibold text-xs transition flex items-center gap-1.5">
+          <i class="fa-solid fa-bolt"></i>
+          <span>100% 자동 반영 방법</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-6">
+
+    <!-- Top Banner Alert (Closest Reset) -->
+    <div id="closestResetBanner" class="p-3.5 rounded-xl bg-indigo-950/40 border border-indigo-500/30 flex items-center justify-between text-xs backdrop-blur">
+      <div class="flex items-center gap-2.5 text-indigo-200">
+        <i class="fa-solid fa-clock-rotate-left text-indigo-400 text-sm animate-spin-slow"></i>
+        <span>가장 빠른 초기화: <strong id="closestResetName" class="text-white font-bold">Gemini 5시간 제한</strong></span>
+        <span class="text-indigo-400">•</span>
+        <span id="closestResetCountdown" class="text-emerald-400 font-mono font-bold text-sm">1시간 37분 남음</span>
+        <span class="text-slate-400 hidden sm:inline">(초기화 시 한도가 100%로 복원됩니다)</span>
+      </div>
+      <button onclick="window.quotaApp.refreshAll()" class="text-[11px] text-indigo-300 hover:text-white flex items-center gap-1">
+        <i class="fa-solid fa-arrows-rotate"></i> 새로고침
+      </button>
+    </div>
+
+    <!-- 2 Main Cards Grid (Matching User Screenshots Exactly) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+
+      <!-- ========================================================
+           CARD 1: CLAUDE USAGE LIMITS (Screenshot 1)
+           ======================================================== -->
+      <div class="bg-[#161922] rounded-2xl border border-slate-800/90 p-6 shadow-2xl relative overflow-hidden flex flex-col justify-between">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm">
+              <i class="fa-solid fa-brain"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="font-bold text-white text-base tracking-tight">사용 한도 · 팀</h2>
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30">Claude.ai</span>
+              </div>
+              <p class="text-[11px] text-slate-400">Anthropic Claude Pro / Team 세션 한도</p>
+              <p id="claudeSyncStatus" class="text-[10px] text-slate-500">● 동기화 확인 중...</p>
+            </div>
+          </div>
+          
+          <button onclick="window.quotaApp.openEditModal('claude')" class="text-xs text-slate-400 hover:text-white transition flex items-center gap-1">
+            <span>수정</span> <i class="fa-solid fa-pen-to-square text-[10px]"></i>
+          </button>
+        </div>
+
+        <!-- Limits Content -->
+        <div class="py-5 space-y-6">
+          
+          <!-- 1. 5시간 제한 -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-sm">
+              <span class="font-medium text-slate-200">5시간 제한</span>
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-slate-400" id="claude5hResetLabel">오후 11:30에 초기화</span>
+                <span class="font-bold text-white font-mono text-sm" id="claude5hPercentText">35%</span>
+              </div>
+            </div>
+
+            <!-- Progress Bar (Blue bar matching user screenshot) -->
+            <div class="w-full bg-[#232733] h-2 rounded-full overflow-hidden">
+              <div id="claude5hBar" class="h-full rounded-full bg-[#1e70eb] transition-all duration-700" style="width: 35%;"></div>
+            </div>
+
+            <!-- Live Timer Countdown -->
+            <div class="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
+              <span>남은 한도: <strong class="text-emerald-400" id="claude5hLeftText">65% 남음</strong></span>
+              <span class="flex items-center gap-1 font-mono text-slate-400">
+                <i class="fa-regular fa-clock text-[10px]"></i> 초기화까지 <strong class="text-slate-200" id="claude5hTimer">1시간 28분 30초</strong>
+              </span>
+            </div>
+          </div>
+
+          <!-- 2. 주간 · 모든 모델 -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-sm">
+              <span class="font-medium text-slate-200">주간 · 모든 모델</span>
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-slate-400" id="claudeWeeklyResetLabel">(토) 오전 7:00에 초기화</span>
+                <span class="font-bold text-white font-mono text-sm" id="claudeWeeklyPercentText">27%</span>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-[#232733] h-2 rounded-full overflow-hidden">
+              <div id="claudeWeeklyBar" class="h-full rounded-full bg-[#1e70eb] transition-all duration-700" style="width: 27%;"></div>
+            </div>
+
+            <!-- Live Timer Countdown -->
+            <div class="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
+              <span>남은 한도: <strong class="text-emerald-400" id="claudeWeeklyLeftText">73% 남음</strong></span>
+              <span class="flex items-center gap-1 font-mono text-slate-400">
+                <i class="fa-regular fa-calendar text-[10px]"></i> 초기화까지 <strong class="text-slate-200" id="claudeWeeklyTimer">5일 9시간 8분</strong>
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Bottom Quick Counter Actions -->
+        <div class="pt-4 border-t border-slate-800 flex items-center justify-between">
+          <span class="text-[11px] text-slate-500">Claude 대화 시 사용량 차감</span>
+          <div class="flex items-center gap-2">
+            <button onclick="window.quotaApp.addUsage('claude', 5)" 
+              class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs transition">
+              +5% 사용
+            </button>
+            <button onclick="window.quotaApp.resetLimit('claude')" 
+              class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-blue-900/40 text-blue-400 text-xs transition">
+              초기화 (리셋)
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ========================================================
+           CARD 2: GEMINI & MULTI-MODEL USAGE (Screenshot 2)
+           ======================================================== -->
+      <div class="bg-[#161922] rounded-2xl border border-slate-800/90 p-6 shadow-2xl relative overflow-hidden flex flex-col justify-between">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm">
+              <i class="fa-brands fa-google"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="font-bold text-white text-base tracking-tight">Usage</h2>
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/30">Google Antigravity</span>
+              </div>
+              <p class="text-[11px] text-slate-400">Gemini Models · Claude & GPT · Argon</p>
+            </div>
+          </div>
+
+          <button onclick="window.quotaApp.openEditModal('gemini')" class="text-xs text-slate-400 hover:text-white transition flex items-center gap-1">
+            <span>수정</span> <i class="fa-solid fa-pen-to-square text-[10px]"></i>
+          </button>
+        </div>
+
+        <!-- Limits Content -->
+        <div class="py-4 space-y-5">
+          
+          <!-- 1. Gemini Models -->
+          <div class="space-y-2.5 pb-3 border-b border-slate-800/60">
+            <h3 class="font-semibold text-slate-200 text-sm">Gemini Models</h3>
+            
+            <!-- Weekly limit -->
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400">Weekly limit</span>
+              <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-white font-mono" id="geminiWeeklyLeft">53% left</span>
+                  <div class="relative w-4 h-4 flex items-center justify-center">
+                    <svg class="w-4 h-4 transform -rotate-90">
+                      <circle cx="8" cy="8" r="6" stroke="#2a3042" stroke-width="2" fill="none" />
+                      <circle id="geminiWeeklyCircle" cx="8" cy="8" r="6" stroke="#22c55e" stroke-width="2" fill="none" stroke-dasharray="37.7" stroke-dashoffset="17.7" stroke-linecap="round" />
+                    </svg>
+                  </div>
+                </div>
+                <span class="text-slate-500 text-[11px] font-mono" id="geminiWeeklyTimer">Resets in 1d 23h</span>
+              </div>
+            </div>
+
+            <!-- 5h limit -->
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400">5h limit</span>
+              <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-white font-mono" id="gemini5hLeft">92% left</span>
+                  <div class="relative w-4 h-4 flex items-center justify-center">
+                    <svg class="w-4 h-4 transform -rotate-90">
+                      <circle cx="8" cy="8" r="6" stroke="#2a3042" stroke-width="2" fill="none" />
+                      <circle id="gemini5hCircle" cx="8" cy="8" r="6" stroke="#22c55e" stroke-width="2" fill="none" stroke-dasharray="37.7" stroke-dashoffset="3.0" stroke-linecap="round" />
+                    </svg>
+                  </div>
+                </div>
+                <span class="text-slate-500 text-[11px] font-mono" id="gemini5hTimer">Resets in 1h 37m</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Claude and GPT models -->
+          <div class="space-y-2.5 pb-3 border-b border-slate-800/60">
+            <h3 class="font-semibold text-slate-200 text-sm">Claude and GPT models</h3>
+            
+            <!-- Weekly limit -->
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400">Weekly limit</span>
+              <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-white font-mono" id="claudeGptWeeklyLeft">50% left</span>
+                  <div class="relative w-4 h-4 flex items-center justify-center">
+                    <svg class="w-4 h-4 transform -rotate-90">
+                      <circle cx="8" cy="8" r="6" stroke="#2a3042" stroke-width="2" fill="none" />
+                      <circle id="claudeGptWeeklyCircle" cx="8" cy="8" r="6" stroke="#22c55e" stroke-width="2" fill="none" stroke-dasharray="37.7" stroke-dashoffset="18.8" stroke-linecap="round" />
+                    </svg>
+                  </div>
+                </div>
+                <span class="text-slate-500 text-[11px] font-mono" id="claudeGptWeeklyTimer">Resets in 5d 8h</span>
+              </div>
+            </div>
+
+            <!-- 5h limit -->
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400">5h limit</span>
+              <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-emerald-400 font-mono" id="claudeGpt5hLeft">100% left</span>
+                  <div class="relative w-4 h-4 flex items-center justify-center">
+                    <svg class="w-4 h-4 transform -rotate-90">
+                      <circle cx="8" cy="8" r="6" stroke="#22c55e" stroke-width="2" fill="none" />
+                    </svg>
+                  </div>
+                </div>
+                <span class="text-slate-500 text-[11px] font-mono" id="claudeGpt5hTimer">완전 충전됨</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Gemini 4 Argon (Warning state matching screenshot) -->
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold text-slate-200 text-sm flex items-center gap-1.5">
+                <span>Gemini 4 Argon</span>
+                <span class="text-[10px] px-1.5 py-0.2 rounded bg-rose-500/10 text-rose-400 font-medium">한도 소진 임박</span>
+              </h3>
+            </div>
+            
+            <!-- Weekly limit -->
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400">Weekly limit</span>
+              <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-rose-400 font-mono" id="argonWeeklyLeft">4% left</span>
+                  <div class="relative w-4 h-4 flex items-center justify-center">
+                    <svg class="w-4 h-4 transform -rotate-90">
+                      <circle cx="8" cy="8" r="6" stroke="#2a3042" stroke-width="2" fill="none" />
+                      <circle id="argonWeeklyCircle" cx="8" cy="8" r="6" stroke="#f43f5e" stroke-width="2" fill="none" stroke-dasharray="37.7" stroke-dashoffset="36.2" stroke-linecap="round" />
+                    </svg>
+                  </div>
+                </div>
+                <span class="text-slate-500 text-[11px] font-mono" id="argonWeeklyTimer">Resets in 1d 22h</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Bottom Quick Actions -->
+        <div class="pt-4 border-t border-slate-800 flex items-center justify-between">
+          <span class="text-[11px] text-slate-500">Antigravity 세션 동기화</span>
+          <div class="flex items-center gap-2">
+            <button onclick="window.quotaApp.addUsage('gemini', 5)" 
+              class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs transition">
+              +5% 사용
+            </button>
+            <button onclick="window.quotaApp.resetLimit('gemini')" 
+              class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-blue-900/40 text-blue-400 text-xs transition">
+              초기화 (리셋)
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Comparison Table / Quick Summary Matrix -->
+    <div class="bg-[#161922] rounded-2xl border border-slate-800/90 p-5 shadow-xl">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-bold text-white text-sm flex items-center gap-2">
+          <i class="fa-solid fa-list-check text-indigo-400"></i> 전체 모델 한도 및 리셋 일정 요약
+        </h3>
+        <span class="text-xs text-slate-400">1초마다 실시간 카운트다운 진행</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="border-b border-slate-800 text-slate-400 font-semibold bg-slate-950/40">
+              <th class="py-2.5 px-3">모델 / 서비스</th>
+              <th class="py-2.5 px-3">제한 종류</th>
+              <th class="py-2.5 px-3">소진율 / 잔여량</th>
+              <th class="py-2.5 px-3">상태</th>
+              <th class="py-2.5 px-3 text-right">초기화 예정 시각</th>
+              <th class="py-2.5 px-3 text-right">남은 시간</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60 font-mono">
+            <tr>
+              <td class="py-2.5 px-3 font-sans font-semibold text-amber-400">Claude.ai (팀/개인)</td>
+              <td class="py-2.5 px-3 font-sans text-slate-300">5시간 제한</td>
+              <td class="py-2.5 px-3 font-bold text-white" id="tdClaude5hPct">35% 사용 (65% 남음)</td>
+              <td class="py-2.5 px-3 font-sans"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px]">여유</span></td>
+              <td class="py-2.5 px-3 text-right text-slate-300" id="tdClaude5hResetAt">오늘 오후 11:30</td>
+              <td class="py-2.5 px-3 text-right text-emerald-400 font-bold" id="tableTimerClaude5h">-</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 px-3 font-sans font-semibold text-amber-400">Claude.ai (팀/개인)</td>
+              <td class="py-2.5 px-3 font-sans text-slate-300">주간 · 모든 모델</td>
+              <td class="py-2.5 px-3 font-bold text-white" id="tdClaudeWeeklyPct">27% 사용 (73% 남음)</td>
+              <td class="py-2.5 px-3 font-sans"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px]">여유</span></td>
+              <td class="py-2.5 px-3 text-right text-slate-300" id="tdClaudeWeeklyResetAt">이번주 (토) 오전 7:00</td>
+              <td class="py-2.5 px-3 text-right text-slate-300" id="tableTimerClaudeWeekly">-</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 px-3 font-sans font-semibold text-blue-400">Gemini Models</td>
+              <td class="py-2.5 px-3 font-sans text-slate-300">5h limit</td>
+              <td class="py-2.5 px-3 font-bold text-white" id="tdGemini5hPct">8% 사용 (92% 남음)</td>
+              <td class="py-2.5 px-3 font-sans"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px]">충분</span></td>
+              <td class="py-2.5 px-3 text-right text-slate-300">약 1시간 37분 후</td>
+              <td class="py-2.5 px-3 text-right text-emerald-400 font-bold" id="tableTimerGemini5h">-</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 px-3 font-sans font-semibold text-blue-400">Gemini Models</td>
+              <td class="py-2.5 px-3 font-sans text-slate-300">Weekly limit</td>
+              <td class="py-2.5 px-3 font-bold text-white" id="tdGeminiWeeklyPct">47% 사용 (53% 남음)</td>
+              <td class="py-2.5 px-3 font-sans"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px]">원활</span></td>
+              <td class="py-2.5 px-3 text-right text-slate-300">약 1일 23시간 후</td>
+              <td class="py-2.5 px-3 text-right text-slate-300" id="tableTimerGeminiWeekly">-</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 px-3 font-sans font-semibold text-emerald-400">Claude and GPT models</td>
+              <td class="py-2.5 px-3 font-sans text-slate-300">Weekly limit</td>
+              <td class="py-2.5 px-3 font-bold text-white" id="tdClaudeGptWeeklyPct">50% 사용 (50% 남음)</td>
+              <td class="py-2.5 px-3 font-sans"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px]">중간</span></td>
+              <td class="py-2.5 px-3 text-right text-slate-300">약 5일 8시간 후</td>
+              <td class="py-2.5 px-3 text-right text-slate-300" id="tableTimerClaudeGptWeekly">-</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 px-3 font-sans font-semibold text-rose-400">Gemini 4 Argon</td>
+              <td class="py-2.5 px-3 font-sans text-slate-300">Weekly limit</td>
+              <td class="py-2.5 px-3 font-bold text-rose-400" id="tdArgonWeeklyPct">96% 사용 (4% 남음)</td>
+              <td class="py-2.5 px-3 font-sans"><span class="px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 text-[10px]">소진 경고</span></td>
+              <td class="py-2.5 px-3 text-right text-slate-300">약 1일 22시간 후</td>
+              <td class="py-2.5 px-3 text-right text-rose-400 font-bold" id="tableTimerArgonWeekly">-</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Explanatory Box: How to link your account -->
+    <div class="p-5 rounded-2xl bg-gradient-to-r from-blue-950/30 to-indigo-950/30 border border-blue-500/30 text-xs space-y-3">
+      <div class="flex items-center gap-2 text-blue-300 font-bold text-sm">
+        <i class="fa-solid fa-circle-question"></i>
+        <span>내 실제 계정 사용량과 어떻게 연동되나요?</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-slate-300 leading-relaxed">
+        <div class="space-y-1.5 p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+          <h4 class="font-bold text-white flex items-center gap-1.5 text-xs">
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span> Claude 사용 한도 연동 원리
+          </h4>
+          <p class="text-slate-400 text-[11px]">
+            Claude.ai는 공식 REST API 대신 <strong>5시간/주간 롤링 세션 윈도우</strong>를 사용합니다. 화면 우측 상단의 <strong>[수정]</strong> 버튼으로 현재 claude.ai에 표시된 %와 시간을 입력해 두시면, 본 대시보드가 1초 단위로 리셋 시점을 추적하며 알림을 울려줍니다.
+          </p>
+        </div>
+        <div class="space-y-1.5 p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+          <h4 class="font-bold text-white flex items-center gap-1.5 text-xs">
+            <span class="w-2 h-2 rounded-full bg-blue-400"></span> Gemini & Antigravity 연동 원리
+          </h4>
+          <p class="text-slate-400 text-[11px]">
+            Antigravity IDE의 <strong>Gemini Models / Claude & GPT / Argon</strong> 쿼터 역시 세션 단위로 실시간 갱신됩니다. 현재 잔여량(left %)을 설정해 두시면 실시간 카운트다운 타이머가 초기화 일정을 시각화합니다.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========================================================
+       MODAL: EDIT LIMITS & SETTINGS
+       ======================================================== -->
+  <div id="editLimitModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-[#161922] border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+        <h3 class="font-bold text-white text-base flex items-center gap-2">
+          <i class="fa-solid fa-sliders text-blue-400"></i> 현재 사용량 및 리셋 시간 동기화
+        </h3>
+        <button onclick="document.getElementById('editLimitModal').classList.add('hidden')" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="editLimitForm" onsubmit="window.quotaApp.saveModalSettings(event)" class="space-y-4">
+        
+        <!-- Claude Section -->
+        <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+          <h4 class="font-bold text-xs text-amber-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-brain"></i> Claude 사용 한도
+          </h4>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div>
+              <label class="block text-slate-400 mb-1">5시간 제한 소진율 (%)</label>
+              <input type="number" id="inputClaude5hPct" min="0" max="100" value="35"
+                class="w-full bg-[#202533] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono">
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">5시간 초기화 시간</label>
+              <input type="text" id="inputClaude5hTime" value="23:30" placeholder="예: 23:30 또는 오후 11:30"
+                class="w-full bg-[#202533] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div>
+              <label class="block text-slate-400 mb-1">주간 소진율 (%)</label>
+              <input type="number" id="inputClaudeWeeklyPct" min="0" max="100" value="27"
+                class="w-full bg-[#202533] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono">
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">주간 초기화 요일/시각</label>
+              <input type="text" id="inputClaudeWeeklyTime" value="(토) 오전 7:00" placeholder="예: (토) 오전 7:00"
+                class="w-full bg-[#202533] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono">
+            </div>
+          </div>
+        </div>
+
+        <!-- Gemini Section -->
+        <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+          <h4 class="font-bold text-xs text-blue-400 flex items-center gap-1.5">
+            <i class="fa-brands fa-google"></i> Gemini Models 잔여량
+          </h4>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div>
+              <label class="block text-slate-400 mb-1">Gemini 5h 남은량 (%)</label>
+              <input type="number" id="inputGemini5hLeft" min="0" max="100" value="92"
+                class="w-full bg-[#202533] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono">
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Gemini Weekly 남은량 (%)</label>
+              <input type="number" id="inputGeminiWeeklyLeft" min="0" max="100" value="53"
+                class="w-full bg-[#202533] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div>
+              <label class="block text-slate-400 mb-1">Claude/GPT Weekly (%)</label>
+              <input type="number" id="inputClaudeGptWeeklyLeft" min="0" max="100" value="50"
+                class="w-full bg-[#202533] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono">
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Gemini 4 Argon Weekly (%)</label>
+              <input type="number" id="inputArgonWeeklyLeft" min="0" max="100" value="4"
+                class="w-full bg-[#202533] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono">
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="document.getElementById('editLimitModal').classList.add('hidden')"
+            class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">
+            취소
+          </button>
+          <button type="submit"
+            class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-500/20">
+            저장 및 타이머 시작
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL: AUTO SYNC GUIDE (100% 자동 반영 가이드)
+       ======================================================== -->
+  <div id="autoSyncGuideModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-[#161922] border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+        <h3 class="font-bold text-white text-base flex items-center gap-2">
+          <i class="fa-solid fa-bolt text-indigo-400"></i> 내 계정 사용 시 100% 실시간 자동 반영 방법
+        </h3>
+        <button onclick="document.getElementById('autoSyncGuideModal').classList.add('hidden')" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs text-slate-300 leading-relaxed">
+        <div class="p-3.5 rounded-xl bg-blue-950/30 border border-blue-500/30 text-blue-200">
+          <strong>💡 왜 기본 브라우저에서는 완전 자동 감지가 안 되나요?</strong><br>
+          크롬 브라우저의 보안 규칙(동일 출처 정책)으로 인해, <code>http://localhost:8089</code> 탭은 사용자가 <code>claude.ai</code> 탭이나 Antigravity에서 무엇을 입력하는지 임의로 엿볼 수 없습니다.<br>
+          아래의 <strong>실시간 브릿지(Bridge)</strong>를 통해 사용 즉시 1초 만에 자동 반영되도록 만들 수 있습니다!
+        </div>
+
+        <!-- Option 1: Bookmarklet / Chrome Tampermonkey -->
+        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-sm text-amber-400 flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs">1</span>
+              Claude.ai 원클릭 북마클릿 (가장 간편!)
+            </h4>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400">추천</span>
+          </div>
+          <p class="text-slate-400">
+            Claude 웹사이트(claude.ai)에서 질문 후 브라우저 즐겨찾기(북마클릿)를 누르면, 현재 사용량 수치를 즉시 로컬 서버(<code>/api/quota</code>)로 쏴서 대시보드가 새로고침 없이 즉시 갱신됩니다.
+          </p>
+          <div class="p-2.5 rounded-lg bg-[#202533] font-mono text-[11px] text-slate-300 break-all select-all border border-slate-700">
+            javascript:(function(){var p=prompt("현재 5시간 사용량 %(예: 35)를 입력하세요","35");if(p){fetch('http://localhost:8089/api/quota',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({claude:{fiveHourPct:parseInt(p)}})}).then(r=>alert('⚡ 대시보드 실시간 반영 완료!'));}})();
+          </div>
+          <p class="text-[11px] text-slate-500">위 코드를 브라우저 북마크 URL에 추가해두고 claude.ai 탭에서 누르면 1초 만에 전송됩니다.</p>
+        </div>
+
+        <!-- Option 2: PowerShell Shortcut Command -->
+        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+          <h4 class="font-bold text-sm text-blue-400 flex items-center gap-1.5">
+            <span class="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">2</span>
+            터미널 한 줄 명령으로 실시간 갱신
+          </h4>
+          <p class="text-slate-400">
+            PowerShell 터미널에서 질문 후 아래 명령 한 줄을 치면 대시보드 화면이 실시간으로 바뀝니다:
+          </p>
+          <div class="p-2.5 rounded-lg bg-[#202533] font-mono text-[11px] text-emerald-300 break-all select-all border border-slate-700">
+            Invoke-RestMethod -Uri "http://localhost:8089/api/quota" -Method POST -Body '{"claude":{"fiveHourPct":40}}'
+          </div>
+        </div>
+
+        <!-- Option 3: Built-in Quick Buttons -->
+        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+          <h4 class="font-bold text-sm text-purple-400 flex items-center gap-1.5">
+            <span class="w-5 h-5 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs">3</span>
+            대시보드 자체의 '+5% 사용' 버튼 클릭
+          </h4>
+          <p class="text-slate-400">
+            별도 설정 없이도 각 카드 하단의 <strong>[+5% 사용]</strong> 버튼을 누르면 대화 횟수에 비례하여 게이지가 즉시 오르며, <strong>초기화 시간(카운트다운)</strong>은 컴퓨터 시계와 1초 단위로 완벽하게 연동됩니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="pt-4 mt-4 border-t border-slate-800 flex justify-end">
+        <button onclick="document.getElementById('autoSyncGuideModal').classList.add('hidden')"
+          class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold">
+          확인 완료
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3 bg-slate-900 border border-slate-700 px-4 py-3 rounded-2xl shadow-2xl backdrop-blur">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+    <span id="toastMessage" class="text-xs sm:text-sm font-medium text-slate-200"></span>
+  </div>
+
+  <script src="js/quota.js"></script>
+</body>
+</html>

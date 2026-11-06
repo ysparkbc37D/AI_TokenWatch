@@ -716,21 +716,21 @@
     // 깃허브 Pages 등 정적 호스팅 환경에서는 정적 스냅샷 파일 즉시 로드
     if (isGhPages && staticFallbacks[path]) {
       try {
-        const rStatic = await fetch(staticFallbacks[path], { cache: 'no-store' });
+        const rStatic = await fetch(`${staticFallbacks[path]}?_t=${Date.now()}`, { cache: 'no-store' });
         if (rStatic.ok) return await rStatic.json();
       } catch {}
     }
 
     try {
       const url = base ? `${base}${path}` : path;
-      const r = await fetch(url, { cache: 'no-store' });
+      const r = await fetch(`${url}${url.includes('?') ? '&' : '?'}_t=${Date.now()}`, { cache: 'no-store' });
       if (r.ok) return await r.json();
       throw new Error(`HTTP ${r.status}`);
     } catch (err) {
       // 로컬 서버 연결 실패 시 스냅샷 데이터로 자동 폴백
       if (staticFallbacks[path]) {
         try {
-          const rStatic = await fetch(staticFallbacks[path], { cache: 'no-store' });
+          const rStatic = await fetch(`${staticFallbacks[path]}?_t=${Date.now()}`, { cache: 'no-store' });
           if (rStatic.ok) return await rStatic.json();
         } catch {}
       }
@@ -740,13 +740,13 @@
 
   async function pollQuota() {
     const isGhPages = !getBaseApi() && (location.hostname.endsWith('github.io') || location.hostname.includes('github.io'));
-    let delay = isGhPages ? 600000 : 15000;
+    let delay = isGhPages ? 60000 : 15000;
     try {
       const q = await getJson('/api/quota');
       const changed = !S.quota || JSON.stringify(q.claude) !== JSON.stringify(S.quota.claude);
       S.quota = q; S.serverOk = true;
       if (changed) loadHistory();
-    } catch { S.serverOk = false; delay = isGhPages ? 300000 : 15000; }
+    } catch { S.serverOk = false; delay = isGhPages ? 60000 : 15000; }
     render();
     setTimeout(pollQuota, delay);
   }
@@ -1018,7 +1018,7 @@
   loadModels(false);
   bindCompanySeg();
   setInterval(tick, 15000);
-  const syncInterval = (!getBaseApi() && location.hostname.includes('github.io')) ? 300000 : 120000;
+  const syncInterval = 60000;
   setInterval(loadHistory, syncInterval);
   setInterval(loadTokens, syncInterval);
 })();

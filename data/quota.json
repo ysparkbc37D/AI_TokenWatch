@@ -1,11 +1,11 @@
 {
     "claude":  {
-                   "fiveHourPct":  32,
-                   "weeklyPct":  6,
-                   "fiveHourResetTime":  1794029400804,
-                   "weeklyResetTime":  1794607200804,
+                   "fiveHourPct":  40,
+                   "weeklyPct":  7,
+                   "fiveHourResetTime":  1794029400799,
+                   "weeklyResetTime":  1794607200799,
                    "source":  "extension",
-                   "lastUpdated":  "2026-11-07T12:06:29.9618850+09:00"
+                   "lastUpdated":  "2026-11-07T12:37:29.9734524+09:00"
                },
     "gemini":  {
                    "fiveHourLeft":  92,
@@ -25,14 +25,14 @@
                                                                "bucketId":  "gemini-weekly",
                                                                "window":  "weekly",
                                                                "name":  "Weekly Limit Remaining",
-                                                               "left":  98.2,
+                                                               "left":  97.2,
                                                                "resetTime":  1794613364000
                                                            },
                                                            {
                                                                "bucketId":  "gemini-5h",
                                                                "window":  "5h",
                                                                "name":  "Five Hour Limit Remaining",
-                                                               "left":  93.6,
+                                                               "left":  92.8,
                                                                "resetTime":  1794026564000
                                                            }
                                                        ]
@@ -76,7 +76,7 @@
                                            "names":  [
                                                          "Gemini Models (weekly)"
                                                      ],
-                                           "left":  98.2,
+                                           "left":  97.2,
                                            "resetTime":  1794613364000,
                                            "group":  "Gemini Models",
                                            "window":  "weekly"
@@ -85,7 +85,7 @@
                                            "names":  [
                                                          "Gemini Models (5h)"
                                                      ],
-                                           "left":  93.6,
+                                           "left":  92.8,
                                            "resetTime":  1794026564000,
                                            "group":  "Gemini Models",
                                            "window":  "5h"
@@ -118,6 +118,6 @@
                                            "window":  "weekly"
                                        }
                                    ],
-                        "lastUpdated":  "2026-11-07T12:06:15.1226551+09:00"
+                        "lastUpdated":  "2026-11-07T12:36:35.1058081+09:00"
                     }
 }

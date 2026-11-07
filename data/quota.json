@@ -1,11 +1,11 @@
 {
     "claude":  {
-                   "fiveHourPct":  25,
-                   "weeklyPct":  5,
-                   "fiveHourResetTime":  1794029400886,
-                   "weeklyResetTime":  1794607200886,
+                   "fiveHourPct":  32,
+                   "weeklyPct":  6,
+                   "fiveHourResetTime":  1794029400804,
+                   "weeklyResetTime":  1794607200804,
                    "source":  "extension",
-                   "lastUpdated":  "2026-11-07T11:36:30.0342903+09:00"
+                   "lastUpdated":  "2026-11-07T12:06:29.9618850+09:00"
                },
     "gemini":  {
                    "fiveHourLeft":  92,
@@ -32,7 +32,7 @@
                                                                "bucketId":  "gemini-5h",
                                                                "window":  "5h",
                                                                "name":  "Five Hour Limit Remaining",
-                                                               "left":  93.8,
+                                                               "left":  93.6,
                                                                "resetTime":  1794026564000
                                                            }
                                                        ]
@@ -85,7 +85,7 @@
                                            "names":  [
                                                          "Gemini Models (5h)"
                                                      ],
-                                           "left":  93.8,
+                                           "left":  93.6,
                                            "resetTime":  1794026564000,
                                            "group":  "Gemini Models",
                                            "window":  "5h"
@@ -118,6 +118,6 @@
                                            "window":  "weekly"
                                        }
                                    ],
-                        "lastUpdated":  "2026-11-07T11:35:56.7104978+09:00"
+                        "lastUpdated":  "2026-11-07T12:06:15.1226551+09:00"
                     }
 }

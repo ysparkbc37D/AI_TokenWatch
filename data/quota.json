@@ -1,11 +1,11 @@
 {
     "claude":  {
-                   "fiveHourPct":  11,
-                   "weeklyPct":  2,
-                   "fiveHourResetTime":  1794029400753,
-                   "weeklyResetTime":  1794607200753,
+                   "fiveHourPct":  23,
+                   "weeklyPct":  4,
+                   "fiveHourResetTime":  1794029400817,
+                   "weeklyResetTime":  1794607200817,
                    "source":  "extension",
-                   "lastUpdated":  "2026-11-07T09:36:29.9911146+09:00"
+                   "lastUpdated":  "2026-11-07T10:06:30.0062773+09:00"
                },
     "gemini":  {
                    "fiveHourLeft":  92,
@@ -25,14 +25,14 @@
                                                                "bucketId":  "gemini-weekly",
                                                                "window":  "weekly",
                                                                "name":  "Weekly Limit Remaining",
-                                                               "left":  98,
+                                                               "left":  97.1,
                                                                "resetTime":  1794613364000
                                                            },
                                                            {
                                                                "bucketId":  "gemini-5h",
                                                                "window":  "5h",
                                                                "name":  "Five Hour Limit Remaining",
-                                                               "left":  93,
+                                                               "left":  92.5,
                                                                "resetTime":  1794026564000
                                                            }
                                                        ]
@@ -65,7 +65,7 @@
                                                                "bucketId":  "gemini-argon-wtu-weekly",
                                                                "window":  "weekly",
                                                                "name":  "Gemini 4 Argon Weekly Limit",
-                                                               "left":  92.9,
+                                                               "left":  77.1,
                                                                "resetTime":  1794616025000
                                                            }
                                                        ]
@@ -76,7 +76,7 @@
                                            "names":  [
                                                          "Gemini Models (weekly)"
                                                      ],
-                                           "left":  98,
+                                           "left":  97.1,
                                            "resetTime":  1794613364000,
                                            "group":  "Gemini Models",
                                            "window":  "weekly"
@@ -85,7 +85,7 @@
                                            "names":  [
                                                          "Gemini Models (5h)"
                                                      ],
-                                           "left":  93,
+                                           "left":  92.5,
                                            "resetTime":  1794026564000,
                                            "group":  "Gemini Models",
                                            "window":  "5h"
@@ -112,12 +112,12 @@
                                            "names":  [
                                                          "Gemini 4 Argon (weekly)"
                                                      ],
-                                           "left":  92.9,
+                                           "left":  77.1,
                                            "resetTime":  1794616025000,
                                            "group":  "Gemini 4 Argon",
                                            "window":  "weekly"
                                        }
                                    ],
-                        "lastUpdated":  "2026-11-07T09:36:45.0269910+09:00"
+                        "lastUpdated":  "2026-11-07T10:07:00.0715539+09:00"
                     }
 }

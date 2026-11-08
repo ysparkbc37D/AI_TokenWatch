@@ -1,11 +1,11 @@
 {
     "claude":  {
-                   "fiveHourPct":  72,
-                   "weeklyPct":  40,
-                   "fiveHourResetTime":  1794104400794,
-                   "weeklyResetTime":  1794607200794,
+                   "fiveHourPct":  83,
+                   "weeklyPct":  42,
+                   "fiveHourResetTime":  1794104400918,
+                   "weeklyResetTime":  1794607200918,
                    "source":  "extension",
-                   "lastUpdated":  "2026-11-08T08:38:29.9274870+09:00"
+                   "lastUpdated":  "2026-11-08T09:08:30.0452018+09:00"
                },
     "gemini":  {
                    "fiveHourLeft":  92,
@@ -33,7 +33,7 @@
                                                                "window":  "5h",
                                                                "name":  "Five Hour Limit Remaining",
                                                                "left":  100,
-                                                               "resetTime":  1794112480000
+                                                               "resetTime":  1794114350000
                                                            }
                                                        ]
                                        },
@@ -53,7 +53,7 @@
                                                                "window":  "5h",
                                                                "name":  "Five Hour Limit Remaining",
                                                                "left":  100,
-                                                               "resetTime":  1794112480000
+                                                               "resetTime":  1794114350000
                                                            }
                                                        ]
                                        },
@@ -86,7 +86,7 @@
                                                          "Gemini Models (5h)"
                                                      ],
                                            "left":  100,
-                                           "resetTime":  1794112480000,
+                                           "resetTime":  1794114350000,
                                            "group":  "Gemini Models",
                                            "window":  "5h"
                                        },
@@ -104,7 +104,7 @@
                                                          "Claude and GPT models (5h)"
                                                      ],
                                            "left":  100,
-                                           "resetTime":  1794112480000,
+                                           "resetTime":  1794114350000,
                                            "group":  "Claude and GPT models",
                                            "window":  "5h"
                                        },
@@ -118,6 +118,6 @@
                                            "window":  "weekly"
                                        }
                                    ],
-                        "lastUpdated":  "2026-11-08T08:38:49.9725959+09:00"
+                        "lastUpdated":  "2026-11-08T09:08:56.6377453+09:00"
                     }
 }

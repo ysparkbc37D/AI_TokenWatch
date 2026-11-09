@@ -1005,12 +1005,37 @@
     }
   }
 
+  // ---------- 수동 즉시 새로고침 버튼 ----------
+  function initRefreshBtn() {
+    const btn = $('#refreshBtn');
+    if (!btn) return;
+    btn.addEventListener('click', async () => {
+      const icon = btn.querySelector('.refresh-icon');
+      if (icon) icon.classList.add('spinning');
+      btn.disabled = true;
+      try {
+        await Promise.allSettled([
+          pollQuota(),
+          loadHistory(),
+          loadTokens()
+        ]);
+        tick();
+      } finally {
+        setTimeout(() => {
+          if (icon) icon.classList.remove('spinning');
+          btn.disabled = false;
+        }, 500);
+      }
+    });
+  }
+
   // ---------- 시작 ----------
   const srvEl = $('#serverAddr');
   if (srvEl) srvEl.textContent = `서버 ${API ? 'localhost:8089' : location.host}`;
   tick();
   initDefaultModels();
   initPwa();
+  initRefreshBtn();
   render(true);
   pollQuota();
   loadHistory();

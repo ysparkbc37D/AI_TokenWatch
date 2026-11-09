@@ -83,8 +83,14 @@
     }
     if (yMax === 100) {
       const y80 = y(80);
+      const y100 = y(100);
+      // 80%~100% 임계 구간 소프트 앰버 배경 밴드
+      el('rect', {
+        x: pad.l, y: y100, width: iw, height: y80 - y100,
+        fill: 'rgba(245, 158, 11, 0.04)', 'pointer-events': 'none'
+      }, svg);
       el('line', { class: 'grid-warn', x1: pad.l, x2: W - pad.r, y1: y80, y2: y80 }, svg);
-      el('text', { class: 'axis-warn', x: W - pad.r, y: y80 - 4, 'text-anchor': 'end' }, svg).textContent = '80% 한도 주의';
+      el('text', { class: 'axis-warn', x: W - pad.r, y: y80 - 4, 'text-anchor': 'end' }, svg).textContent = '⚠ 80% 한도 주의';
     }
     const maxTicks = W < 420 ? 3 : W < 650 ? 4 : (opts.ticks || 6);
     const ticks = Math.min(opts.ticks || 6, maxTicks);

@@ -1,6 +1,36 @@
 {
-    "updatedAt":  "2026-11-11T02:14:46.5382555+09:00",
+    "updatedAt":  "2026-11-11T02:43:51.7697862+09:00",
     "months":  {
+                   "2026-11":  {
+                                   "month":  "2026-11",
+                                   "total":  404634042.65000004,
+                                   "in":  53757845,
+                                   "cw":  16896941,
+                                   "cr":  2737970564,
+                                   "out":  11191593,
+                                   "turns":  13058,
+                                   "byProvider":  {
+                                                      "antigravity":  156354313.9,
+                                                      "claude":  189258985.75,
+                                                      "codex":  59020742.999999985
+                                                  },
+                                   "byModel":  {
+                                                   "Gemini 4 Argon (High)":  821764.5,
+                                                   "Gemini 3.8 Flash (High)":  147154360.1,
+                                                   "claude-sonnet-5-5":  19490331.3,
+                                                   "codex-auto-review":  6699682.8,
+                                                   "gpt-6.1-sol":  38108600.400000006,
+                                                   "gpt-6-luna":  3829304.2,
+                                                   "gpt-5.6-luna":  2013377.0000000002,
+                                                   "claude-opus-5-5":  167149547.35000002,
+                                                   "gpt-6-sol":  5674867.8,
+                                                   "gpt-6-astra":  2578167,
+                                                   "Gemini 4 Argon (Medium)":  8378189.3000000007,
+                                                   "claude-haiku-5-5":  40208.15,
+                                                   "gpt-5.6-terra":  116743.8,
+                                                   "claude-fable-5-2":  2578898.95
+                                               }
+                               },
                    "2026-10":  {
                                    "month":  "2026-10",
                                    "total":  42245925.7,
@@ -17,35 +47,6 @@
                                                    "Gemini 3.8 Flash (High)":  26264531.5,
                                                    "gpt-6.1-sol":  11662288,
                                                    "gpt-6-sol":  4319106.2
-                                               }
-                               },
-                   "2026-11":  {
-                                   "month":  "2026-11",
-                                   "total":  403709242.65000004,
-                                   "in":  53429584,
-                                   "cw":  16896941,
-                                   "cr":  2734173474,
-                                   "out":  11148227,
-                                   "turns":  13029,
-                                   "byProvider":  {
-                                                      "antigravity":  155429513.9,
-                                                      "claude":  189258985.75,
-                                                      "codex":  59020742.999999985
-                                                  },
-                                   "byModel":  {
-                                                   "Gemini 3.8 Flash (High)":  147051324.6,
-                                                   "claude-sonnet-5-5":  19490331.3,
-                                                   "codex-auto-review":  6699682.8,
-                                                   "gpt-6.1-sol":  38108600.400000006,
-                                                   "gpt-6-luna":  3829304.2,
-                                                   "gpt-5.6-luna":  2013377.0000000002,
-                                                   "claude-opus-5-5":  167149547.35000002,
-                                                   "gpt-6-sol":  5674867.8,
-                                                   "gpt-6-astra":  2578167,
-                                                   "Gemini 4 Argon (Medium)":  8378189.3000000007,
-                                                   "claude-haiku-5-5":  40208.15,
-                                                   "gpt-5.6-terra":  116743.8,
-                                                   "claude-fable-5-2":  2578898.95
                                                }
                                },
                    "2026-09":  {
@@ -88,9 +89,39 @@
     "years":  {
                   "2026":  {
                                "year":  "2026",
-                               "total":  632298305.19999981,
-                               "turns":  19371,
+                               "total":  633223105.19999981,
+                               "turns":  19400,
                                "months":  [
+                                              {
+                                                  "month":  "2026-11",
+                                                  "total":  404634042.65000004,
+                                                  "in":  53757845,
+                                                  "cw":  16896941,
+                                                  "cr":  2737970564,
+                                                  "out":  11191593,
+                                                  "turns":  13058,
+                                                  "byProvider":  {
+                                                                     "antigravity":  156354313.9,
+                                                                     "claude":  189258985.75,
+                                                                     "codex":  59020742.999999985
+                                                                 },
+                                                  "byModel":  {
+                                                                  "Gemini 4 Argon (High)":  821764.5,
+                                                                  "Gemini 3.8 Flash (High)":  147154360.1,
+                                                                  "claude-sonnet-5-5":  19490331.3,
+                                                                  "codex-auto-review":  6699682.8,
+                                                                  "gpt-6.1-sol":  38108600.400000006,
+                                                                  "gpt-6-luna":  3829304.2,
+                                                                  "gpt-5.6-luna":  2013377.0000000002,
+                                                                  "claude-opus-5-5":  167149547.35000002,
+                                                                  "gpt-6-sol":  5674867.8,
+                                                                  "gpt-6-astra":  2578167,
+                                                                  "Gemini 4 Argon (Medium)":  8378189.3000000007,
+                                                                  "claude-haiku-5-5":  40208.15,
+                                                                  "gpt-5.6-terra":  116743.8,
+                                                                  "claude-fable-5-2":  2578898.95
+                                                              }
+                                              },
                                               {
                                                   "month":  "2026-10",
                                                   "total":  42245925.7,
@@ -107,35 +138,6 @@
                                                                   "Gemini 3.8 Flash (High)":  26264531.5,
                                                                   "gpt-6.1-sol":  11662288,
                                                                   "gpt-6-sol":  4319106.2
-                                                              }
-                                              },
-                                              {
-                                                  "month":  "2026-11",
-                                                  "total":  403709242.65000004,
-                                                  "in":  53429584,
-                                                  "cw":  16896941,
-                                                  "cr":  2734173474,
-                                                  "out":  11148227,
-                                                  "turns":  13029,
-                                                  "byProvider":  {
-                                                                     "antigravity":  155429513.9,
-                                                                     "claude":  189258985.75,
-                                                                     "codex":  59020742.999999985
-                                                                 },
-                                                  "byModel":  {
-                                                                  "Gemini 3.8 Flash (High)":  147051324.6,
-                                                                  "claude-sonnet-5-5":  19490331.3,
-                                                                  "codex-auto-review":  6699682.8,
-                                                                  "gpt-6.1-sol":  38108600.400000006,
-                                                                  "gpt-6-luna":  3829304.2,
-                                                                  "gpt-5.6-luna":  2013377.0000000002,
-                                                                  "claude-opus-5-5":  167149547.35000002,
-                                                                  "gpt-6-sol":  5674867.8,
-                                                                  "gpt-6-astra":  2578167,
-                                                                  "Gemini 4 Argon (Medium)":  8378189.3000000007,
-                                                                  "claude-haiku-5-5":  40208.15,
-                                                                  "gpt-5.6-terra":  116743.8,
-                                                                  "claude-fable-5-2":  2578898.95
                                                               }
                                               },
                                               {
@@ -177,6 +179,6 @@
                                           ]
                            }
               },
-    "totalRows":  121,
+    "totalRows":  123,
     "engine":  "SQLite + Portable JSON Vault"
 }

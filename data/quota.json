@@ -2,10 +2,10 @@
     "claude":  {
                    "fiveHourPct":  19,
                    "weeklyPct":  100,
-                   "fiveHourResetTime":  1794343800906,
-                   "weeklyResetTime":  1794607200906,
+                   "fiveHourResetTime":  1794343800877,
+                   "weeklyResetTime":  1794607199877,
                    "source":  "extension",
-                   "lastUpdated":  "2026-11-11T03:13:30.0534606+09:00"
+                   "lastUpdated":  "2026-11-11T03:44:30.0199983+09:00"
                },
     "gemini":  {
                    "fiveHourLeft":  92,
@@ -53,7 +53,7 @@
                                                                "window":  "5h",
                                                                "name":  "Five Hour Limit Remaining",
                                                                "left":  100,
-                                                               "resetTime":  1794352300000
+                                                               "resetTime":  1794354182000
                                                            }
                                                        ]
                                        },
@@ -65,7 +65,7 @@
                                                                "bucketId":  "gemini-argon-wtu-weekly",
                                                                "window":  "weekly",
                                                                "name":  "Gemini 4 Argon Weekly Limit",
-                                                               "left":  23.9,
+                                                               "left":  24.3,
                                                                "resetTime":  1794616025000
                                                            }
                                                        ]
@@ -104,7 +104,7 @@
                                                          "Claude and GPT models (5h)"
                                                      ],
                                            "left":  100,
-                                           "resetTime":  1794352300000,
+                                           "resetTime":  1794354182000,
                                            "group":  "Claude and GPT models",
                                            "window":  "5h"
                                        },
@@ -112,12 +112,12 @@
                                            "names":  [
                                                          "Gemini 4 Argon (weekly)"
                                                      ],
-                                           "left":  23.9,
+                                           "left":  24.3,
                                            "resetTime":  1794616025000,
                                            "group":  "Gemini 4 Argon",
                                            "window":  "weekly"
                                        }
                                    ],
-                        "lastUpdated":  "2026-11-11T03:13:45.0910941+09:00"
+                        "lastUpdated":  "2026-11-11T03:44:05.1360293+09:00"
                     }
 }

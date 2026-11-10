@@ -3,9 +3,9 @@
                    "fiveHourResetTime":  1794270599850,
                    "fiveHourPct":  0,
                    "weeklyPct":  84,
-                   "weeklyResetTime":  1794607199872,
+                   "weeklyResetTime":  1794607199843,
                    "source":  "extension",
-                   "lastUpdated":  "2026-11-10T09:42:30.0067662+09:00"
+                   "lastUpdated":  "2026-11-10T10:11:29.9823987+09:00"
                },
     "gemini":  {
                    "fiveHourLeft":  92,
@@ -53,7 +53,7 @@
                                                                "window":  "5h",
                                                                "name":  "Five Hour Limit Remaining",
                                                                "left":  100,
-                                                               "resetTime":  1794289110000
+                                                               "resetTime":  1794290985000
                                                            }
                                                        ]
                                        },
@@ -104,7 +104,7 @@
                                                          "Claude and GPT models (5h)"
                                                      ],
                                            "left":  100,
-                                           "resetTime":  1794289110000,
+                                           "resetTime":  1794290985000,
                                            "group":  "Claude and GPT models",
                                            "window":  "5h"
                                        },
@@ -118,6 +118,6 @@
                                            "window":  "weekly"
                                        }
                                    ],
-                        "lastUpdated":  "2026-11-10T09:42:35.0294051+09:00"
+                        "lastUpdated":  "2026-11-10T10:11:50.0304899+09:00"
                     }
 }

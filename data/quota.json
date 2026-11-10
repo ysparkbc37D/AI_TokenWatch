@@ -2,10 +2,10 @@
     "claude":  {
                    "fiveHourPct":  60,
                    "weeklyPct":  97,
-                   "fiveHourResetTime":  1794312000890,
-                   "weeklyResetTime":  1794607200890,
+                   "fiveHourResetTime":  1794312000822,
+                   "weeklyResetTime":  1794607200822,
                    "source":  "extension",
-                   "lastUpdated":  "2026-11-10T19:43:30.0629396+09:00"
+                   "lastUpdated":  "2026-11-10T20:13:30.0064185+09:00"
                },
     "gemini":  {
                    "fiveHourLeft":  92,
@@ -53,7 +53,7 @@
                                                                "window":  "5h",
                                                                "name":  "Five Hour Limit Remaining",
                                                                "left":  100,
-                                                               "resetTime":  1794325141000
+                                                               "resetTime":  1794327025000
                                                            }
                                                        ]
                                        },
@@ -104,7 +104,7 @@
                                                          "Claude and GPT models (5h)"
                                                      ],
                                            "left":  100,
-                                           "resetTime":  1794325141000,
+                                           "resetTime":  1794327025000,
                                            "group":  "Claude and GPT models",
                                            "window":  "5h"
                                        },
@@ -118,6 +118,6 @@
                                            "window":  "weekly"
                                        }
                                    ],
-                        "lastUpdated":  "2026-11-10T19:43:11.4553707+09:00"
+                        "lastUpdated":  "2026-11-10T20:13:35.0329207+09:00"
                     }
 }

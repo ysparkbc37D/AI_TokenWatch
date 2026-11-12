@@ -3,9 +3,9 @@
                    "fiveHourResetTime":  1794343800033,
                    "fiveHourPct":  0,
                    "weeklyPct":  100,
-                   "weeklyResetTime":  1794607199823,
+                   "weeklyResetTime":  1794607199829,
                    "source":  "extension",
-                   "lastUpdated":  "2026-11-12T12:46:29.9649353+09:00"
+                   "lastUpdated":  "2026-11-12T13:16:29.9575523+09:00"
                },
     "gemini":  {
                    "fiveHourLeft":  92,
@@ -25,7 +25,7 @@
                                                                "bucketId":  "gemini-weekly",
                                                                "window":  "weekly",
                                                                "name":  "Weekly Limit Remaining",
-                                                               "left":  33.3,
+                                                               "left":  33.5,
                                                                "resetTime":  1794613364000
                                                            },
                                                            {
@@ -53,7 +53,7 @@
                                                                "window":  "5h",
                                                                "name":  "Five Hour Limit Remaining",
                                                                "left":  100,
-                                                               "resetTime":  1794473030000
+                                                               "resetTime":  1794474850000
                                                            }
                                                        ]
                                        },
@@ -65,7 +65,7 @@
                                                                "bucketId":  "gemini-argon-wtu-weekly",
                                                                "window":  "weekly",
                                                                "name":  "Gemini 4 Argon Weekly Limit",
-                                                               "left":  24.3,
+                                                               "left":  9.4,
                                                                "resetTime":  1794616025000
                                                            }
                                                        ]
@@ -76,7 +76,7 @@
                                            "names":  [
                                                          "Gemini Models (weekly)"
                                                      ],
-                                           "left":  33.3,
+                                           "left":  33.5,
                                            "resetTime":  1794613364000,
                                            "group":  "Gemini Models",
                                            "window":  "weekly"
@@ -104,7 +104,7 @@
                                                          "Claude and GPT models (5h)"
                                                      ],
                                            "left":  100,
-                                           "resetTime":  1794473030000,
+                                           "resetTime":  1794474850000,
                                            "group":  "Claude and GPT models",
                                            "window":  "5h"
                                        },
@@ -112,12 +112,12 @@
                                            "names":  [
                                                          "Gemini 4 Argon (weekly)"
                                                      ],
-                                           "left":  24.3,
+                                           "left":  9.4,
                                            "resetTime":  1794616025000,
                                            "group":  "Gemini 4 Argon",
                                            "window":  "weekly"
                                        }
                                    ],
-                        "lastUpdated":  "2026-11-12T12:45:55.0868512+09:00"
+                        "lastUpdated":  "2026-11-12T13:16:15.1912363+09:00"
                     }
 }

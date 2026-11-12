@@ -1,21 +1,21 @@
 {
-    "updatedAt":  "2026-11-12T23:48:05.4306523+09:00",
+    "updatedAt":  "2026-11-13T00:18:20.1327137+09:00",
     "months":  {
                    "2026-11":  {
                                    "month":  "2026-11",
-                                   "total":  472661796.34999996,
-                                   "in":  72143778,
+                                   "total":  474728855.95,
+                                   "in":  72863495,
                                    "cw":  16896941,
-                                   "cr":  3150331521,
-                                   "out":  12872738,
-                                   "turns":  16058,
+                                   "cr":  3158735797,
+                                   "out":  12974121,
+                                   "turns":  16126,
                                    "byProvider":  {
-                                                      "antigravity":  224382067.60000002,
+                                                      "antigravity":  226449127.20000005,
                                                       "claude":  189258985.75,
                                                       "codex":  59020742.999999985
                                                   },
                                    "byModel":  {
-                                                   "Gemini 4 Argon (High)":  68849518.199999988,
+                                                   "Gemini 4 Argon (High)":  70916577.800000012,
                                                    "Gemini 3.8 Flash (High)":  147154360.1,
                                                    "claude-sonnet-5-5":  19490331.3,
                                                    "codex-auto-review":  6699682.8,
@@ -89,24 +89,24 @@
     "years":  {
                   "2026":  {
                                "year":  "2026",
-                               "total":  701250858.9,
-                               "turns":  22400,
+                               "total":  703317918.5,
+                               "turns":  22468,
                                "months":  [
                                               {
                                                   "month":  "2026-11",
-                                                  "total":  472661796.34999996,
-                                                  "in":  72143778,
+                                                  "total":  474728855.95,
+                                                  "in":  72863495,
                                                   "cw":  16896941,
-                                                  "cr":  3150331521,
-                                                  "out":  12872738,
-                                                  "turns":  16058,
+                                                  "cr":  3158735797,
+                                                  "out":  12974121,
+                                                  "turns":  16126,
                                                   "byProvider":  {
-                                                                     "antigravity":  224382067.60000002,
+                                                                     "antigravity":  226449127.20000005,
                                                                      "claude":  189258985.75,
                                                                      "codex":  59020742.999999985
                                                                  },
                                                   "byModel":  {
-                                                                  "Gemini 4 Argon (High)":  68849518.199999988,
+                                                                  "Gemini 4 Argon (High)":  70916577.800000012,
                                                                   "Gemini 3.8 Flash (High)":  147154360.1,
                                                                   "claude-sonnet-5-5":  19490331.3,
                                                                   "codex-auto-review":  6699682.8,
@@ -179,6 +179,6 @@
                                           ]
                            }
               },
-    "totalRows":  124,
+    "totalRows":  125,
     "engine":  "SQLite + Portable JSON Vault"
 }

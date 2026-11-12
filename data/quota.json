@@ -3,9 +3,9 @@
                    "fiveHourResetTime":  1794343800033,
                    "fiveHourPct":  0,
                    "weeklyPct":  100,
-                   "weeklyResetTime":  1794607199848,
+                   "weeklyResetTime":  1794607199135,
                    "source":  "extension",
-                   "lastUpdated":  "2026-11-12T08:46:29.9885566+09:00"
+                   "lastUpdated":  "2026-11-12T09:16:30.2839589+09:00"
                },
     "gemini":  {
                    "fiveHourLeft":  92,
@@ -25,14 +25,14 @@
                                                                "bucketId":  "gemini-weekly",
                                                                "window":  "weekly",
                                                                "name":  "Weekly Limit Remaining",
-                                                               "left":  41.2,
+                                                               "left":  41,
                                                                "resetTime":  1794613364000
                                                            },
                                                            {
                                                                "bucketId":  "gemini-5h",
                                                                "window":  "5h",
                                                                "name":  "Five Hour Limit Remaining",
-                                                               "left":  100,
+                                                               "left":  96.3,
                                                                "resetTime":  1794458413000
                                                            }
                                                        ]
@@ -53,7 +53,7 @@
                                                                "window":  "5h",
                                                                "name":  "Five Hour Limit Remaining",
                                                                "left":  100,
-                                                               "resetTime":  1794458650000
+                                                               "resetTime":  1794460525000
                                                            }
                                                        ]
                                        },
@@ -76,7 +76,7 @@
                                            "names":  [
                                                          "Gemini Models (weekly)"
                                                      ],
-                                           "left":  41.2,
+                                           "left":  41,
                                            "resetTime":  1794613364000,
                                            "group":  "Gemini Models",
                                            "window":  "weekly"
@@ -85,7 +85,7 @@
                                            "names":  [
                                                          "Gemini Models (5h)"
                                                      ],
-                                           "left":  100,
+                                           "left":  96.3,
                                            "resetTime":  1794458413000,
                                            "group":  "Gemini Models",
                                            "window":  "5h"
@@ -104,7 +104,7 @@
                                                          "Claude and GPT models (5h)"
                                                      ],
                                            "left":  100,
-                                           "resetTime":  1794458650000,
+                                           "resetTime":  1794460525000,
                                            "group":  "Claude and GPT models",
                                            "window":  "5h"
                                        },
@@ -118,6 +118,6 @@
                                            "window":  "weekly"
                                        }
                                    ],
-                        "lastUpdated":  "2026-11-12T08:46:15.1654558+09:00"
+                        "lastUpdated":  "2026-11-12T09:16:30.1305161+09:00"
                     }
 }

@@ -1,21 +1,21 @@
 {
-    "updatedAt":  "2026-11-13T00:47:35.1115224+09:00",
+    "updatedAt":  "2026-11-13T01:18:00.1398323+09:00",
     "months":  {
                    "2026-11":  {
                                    "month":  "2026-11",
-                                   "total":  477164538.85,
-                                   "in":  73868040,
+                                   "total":  480873074.15000004,
+                                   "in":  74562657,
                                    "cw":  16896941,
-                                   "cr":  3169343726,
-                                   "out":  13048190,
-                                   "turns":  16196,
+                                   "cr":  3196631509,
+                                   "out":  13105218,
+                                   "turns":  16357,
                                    "byProvider":  {
-                                                      "antigravity":  228884810.10000005,
+                                                      "antigravity":  232593345.40000004,
                                                       "claude":  189258985.75,
                                                       "codex":  59020742.999999985
                                                   },
                                    "byModel":  {
-                                                   "Gemini 4 Argon (High)":  73352260.7,
+                                                   "Gemini 4 Argon (High)":  77060796,
                                                    "Gemini 3.8 Flash (High)":  147154360.1,
                                                    "claude-sonnet-5-5":  19490331.3,
                                                    "codex-auto-review":  6699682.8,
@@ -89,24 +89,24 @@
     "years":  {
                   "2026":  {
                                "year":  "2026",
-                               "total":  705753601.4,
-                               "turns":  22538,
+                               "total":  709462136.7,
+                               "turns":  22699,
                                "months":  [
                                               {
                                                   "month":  "2026-11",
-                                                  "total":  477164538.85,
-                                                  "in":  73868040,
+                                                  "total":  480873074.15000004,
+                                                  "in":  74562657,
                                                   "cw":  16896941,
-                                                  "cr":  3169343726,
-                                                  "out":  13048190,
-                                                  "turns":  16196,
+                                                  "cr":  3196631509,
+                                                  "out":  13105218,
+                                                  "turns":  16357,
                                                   "byProvider":  {
-                                                                     "antigravity":  228884810.10000005,
+                                                                     "antigravity":  232593345.40000004,
                                                                      "claude":  189258985.75,
                                                                      "codex":  59020742.999999985
                                                                  },
                                                   "byModel":  {
-                                                                  "Gemini 4 Argon (High)":  73352260.7,
+                                                                  "Gemini 4 Argon (High)":  77060796,
                                                                   "Gemini 3.8 Flash (High)":  147154360.1,
                                                                   "claude-sonnet-5-5":  19490331.3,
                                                                   "codex-auto-review":  6699682.8,

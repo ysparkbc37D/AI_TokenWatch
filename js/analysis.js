@@ -18,6 +18,7 @@
     if (x) return `GPT-${x[1]}${x[2] ? ' ' + cap(x[2]) : ''}`;
     x = /^(Gemini\s+[\d.]+\s+[A-Za-z0-9]+)(?:\s*\([^)]*\))?/i.exec(m);
     if (x) return x[1];
+    if (/^codex-auto-review$/i.test(m)) return 'Codex Auto Review';
     return m;
   }
 
@@ -313,8 +314,8 @@
     const savedCostKrw = Math.round(savedCostUsd * 1400);
 
     // 2. 모델 적정 분배율 (30점 만점)
-    // 고비용 모델(Opus, Pro) 편중도 점검
-    const heavyW = (sum.byModel || []).filter((m) => /opus|pro/i.test(m.model)).reduce((a, m) => a + m.w, 0);
+    // 고비용 플래그십 모델(Opus, Pro, Argon, Hydrogen, Astra 등) 편중도 점검
+    const heavyW = (sum.byModel || []).filter((m) => /opus|pro|argon|hydrogen|astra|6\.1|orchestrator/i.test(m.model)).reduce((a, m) => a + m.w, 0);
     const heavyRatio = c.w > 0 ? (heavyW / c.w) * 100 : 0;
     let modelScore = 30;
     if (heavyRatio > 95) modelScore = 14;
@@ -348,7 +349,7 @@
     }
 
     if (heavyRatio > 85) {
-      alerts.push({ lv: 'warn', icon: '⚖️', title: 'Opus/Pro 모델 집중', desc: `전체 토큰의 ${Math.round(heavyRatio)}%가 최상위 모델입니다. 단순 탐색·테스트는 Sonnet이나 Flash를 쓰면 한도가 훨씬 오래갑니다.` });
+      alerts.push({ lv: 'warn', icon: '⚖️', title: '플래그십(Opus/Argon/Hydrogen) 집중', desc: `전체 토큰의 ${Math.round(heavyRatio)}%가 최상위 모델입니다. 단순 탐색·테스트는 Sonnet, Flash, Carbon 등을 쓰면 한도가 훨씬 오래갑니다.` });
     } else {
       alerts.push({ lv: 'good', icon: '🎯', title: '적정 모델 황금 분배', desc: `용도별로 가벼운 모델과 고성능 모델을 알뜰하게 조합하여 불필요한 과금과 한도 소진을 막고 있습니다.` });
     }

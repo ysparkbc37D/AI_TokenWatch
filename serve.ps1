@@ -1,4 +1,4 @@
-# LLM Quota Hub - local HTTP server + live sync API
+﻿# LLM Quota Hub - local HTTP server + live sync API
 # ASCII-only on purpose: PowerShell 5.1 reads a no-BOM script as ANSI.
 #   GET  /api/quota    current values
 #   POST /api/quota    update values (Chrome extension, bookmarklet, manual form)
@@ -205,13 +205,13 @@ function Update-Antigravity {
     $status  = $null
     if ($script:agConn) {
         $summary = Invoke-AntigravityQuotaSummary $script:agConn
-        if (-not $summary) { $status = Invoke-AntigravityStatus $script:agConn }
+        $status  = Invoke-AntigravityStatus $script:agConn
     }
     if (-not $summary -and -not $status) {
         $script:agConn = Find-AntigravityConn
         if ($script:agConn) {
             $summary = Invoke-AntigravityQuotaSummary $script:agConn
-            if (-not $summary) { $status = Invoke-AntigravityStatus $script:agConn }
+            $status  = Invoke-AntigravityStatus $script:agConn
         }
     }
 
@@ -227,13 +227,32 @@ function Update-Antigravity {
 
     $parsedGroups = @()
     $models = @()
+    $availableModels = @()
     $plan = "Google AI Pro"
     if ($status -and $status.userStatus.userTier.name) { $plan = [string]$status.userStatus.userTier.name }
+    if ($status -and $status.userStatus.cascadeModelConfigData.clientModelConfigs) {
+        $seenBase = @{}
+        foreach ($cfg in @($status.userStatus.cascadeModelConfigData.clientModelConfigs)) {
+            $lbl = ([string]$cfg.label).Trim()
+            if (-not $lbl) { continue }
+            $base = ($lbl -replace '\s*\((Low|Medium|High|XHigh)\)\s*$', '').Trim()
+            if (-not $seenBase.ContainsKey($base)) {
+                $seenBase[$base] = $true
+                $qInfo = $cfg.quotaInfo
+                $remPct = if ($qInfo -and $null -ne $qInfo.remainingFraction) { [Math]::Round([double]$qInfo.remainingFraction * 100, 1) } else { $null }
+                $availableModels += [pscustomobject]@{
+                    name = $base
+                    left = $remPct
+                }
+            }
+        }
+    }
 
     if ($summary -and $summary.groups) {
         foreach ($grp in $summary.groups) {
             $bList = @()
             foreach ($b in $grp.buckets) {
+                $isDisabled = [bool]$b.disabled
                 $frac = if ($null -eq $b.remainingFraction) { 0 } else { [double]$b.remainingFraction }
                 $reset = $null
                 if ($b.resetTime) { try { $reset = ([DateTimeOffset]::Parse($b.resetTime)).ToUnixTimeMilliseconds() } catch {} }
@@ -243,15 +262,18 @@ function Update-Antigravity {
                     window    = [string]$b.window
                     name      = [string]$b.displayName
                     left      = $leftPct
+                    disabled  = $isDisabled
                     resetTime = $reset
                 }
-                $winLabel = if ($b.window -eq '5h') { '5h' } else { 'weekly' }
-                $models += [pscustomobject]@{
-                    names     = @("$($grp.displayName) ($winLabel)")
-                    left      = $leftPct
-                    resetTime = $reset
-                    group     = [string]$grp.displayName
-                    window    = [string]$b.window
+                if (-not $isDisabled) {
+                    $winLabel = if ($b.window -eq '5h') { '5h' } else { 'weekly' }
+                    $models += [pscustomobject]@{
+                        names     = @("$($grp.displayName) ($winLabel)")
+                        left      = $leftPct
+                        resetTime = $reset
+                        group     = [string]$grp.displayName
+                        window    = [string]$b.window
+                    }
                 }
             }
             $parsedGroups += [pscustomobject]@{
@@ -280,11 +302,12 @@ function Update-Antigravity {
     }
 
     Set-Field $state "antigravity" ([pscustomobject]@{
-        running     = $true
-        plan        = $plan
-        groups      = $parsedGroups
-        models      = $models
-        lastUpdated = (Get-Date).ToString("o")
+        running         = $true
+        plan            = $plan
+        groups          = $parsedGroups
+        models          = $models
+        availableModels = $availableModels
+        lastUpdated     = (Get-Date).ToString("o")
     })
     [System.IO.File]::WriteAllText($dataFile, ($state | ConvertTo-Json -Depth 6), $utf8NoBom)
     Add-AgHistorySample $models

@@ -84,13 +84,15 @@
       agRaw.groups.forEach((g) => {
         const buckets = (g.buckets || []).map((b) => {
           const reset = num(b.resetTime);
-          const left = reset && reset <= now ? 100 : num(b.left);
+          const disabled = !!b.disabled;
+          const left = disabled ? null : (reset && reset <= now ? 100 : num(b.left));
           return {
             bucketId: b.bucketId,
             window: b.window,
             name: b.name,
             left,
             used: left != null ? Math.max(0, 100 - left) : null,
+            disabled,
             resetTime: reset,
             windowMs: b.window === '5h' ? 5 * HOUR : 7 * DAY
           };
@@ -108,6 +110,7 @@
       gptWins,
       ag,
       agGroups,
+      agAvailableModels: (agRaw && Array.isArray(agRaw.availableModels)) ? agRaw.availableModels : [],
       agRunning: !!(agRaw && agRaw.running),
       agAt: agRaw && agRaw.lastUpdated ? new Date(agRaw.lastUpdated).getTime() : null
     };
@@ -131,11 +134,11 @@
   const PAGE = document.body.dataset.page || 'all';
 
   const AG_LABEL_MAP = {
-    'Gemini Models (5h)': 'Gemini 5시간',
-    'Gemini Models (weekly)': 'Gemini 주간',
+    'Gemini Models (5h)': 'Gemini 5시간 (Hydrogen/Flash)',
+    'Gemini Models (weekly)': 'Gemini 주간 (Hydrogen/Flash)',
     'Gemini 4 Argon (weekly)': 'Gemini 4 Argon',
-    'Claude and GPT models (weekly)': 'Claude/GPT (Antigravity 주간)',
-    'Claude and GPT models (5h)': 'Claude/GPT (Antigravity 5시간)'
+    'Claude and GPT models (weekly)': 'Claude 5.5/GPT (Antigravity 주간)',
+    'Claude and GPT models (5h)': 'Claude 5.5/GPT (Antigravity 5시간)'
   };
 
   function trendSeries(times) {
@@ -320,15 +323,30 @@
   }
 
   // ---------- 한도 현황 ----------
-  function limitRow(color, who, what, used, resetAt, windowMs, note) {
+  function extractGroupModels(desc) {
+    if (!desc) return '';
+    const m = /Models within this group:\s*(.+)$/i.exec(desc);
+    return m ? m[1].split(',').map((s) => s.trim()).filter(Boolean).join(' · ') : '';
+  }
+  function limitRow(color, who, what, used, resetAt, windowMs, note, disabled) {
     const now = Date.now();
     const li = document.createElement('li');
     li.innerHTML = '<div class="lim-top"><span class="who"></span><span class="what"></span><span class="pct"></span></div><div class="lim-bar"><i></i></div><div class="lim-meta"><span class="reset"></span><span class="pace"></span></div>';
-    li.style.setProperty('--c', color);
+    li.style.setProperty('--c', disabled ? '#475569' : color);
     $('.who', li).textContent = who;
     $('.what', li).textContent = what;
     $('.what', li).title = what;
     const pct = $('.pct', li);
+    if (disabled) {
+      pct.textContent = '비활성';
+      pct.classList.add('lv-warn');
+      $('i', li).style.width = '0%';
+      $('.reset', li).textContent = resetAt && resetAt > now ? `${fmtDur(resetAt - now)} 후 5h 창 갱신` : (note || '');
+      const pace = $('.pace', li);
+      pace.textContent = '주간 한도 소진으로 미적용';
+      pace.className = 'pace lv-warn';
+      return li;
+    }
     pct.textContent = used == null ? '–' : `${Math.round(used)}%`;
     if (used != null) pct.classList.add(lvClass(used));
     $('i', li).style.width = `${used == null ? 0 : Math.max(0, Math.min(100, used))}%`;
@@ -375,11 +393,12 @@
     const gemGroups = (L.agGroups || []).filter((g) => !/claude|gpt/i.test(g.name));
     if (gemGroups.length) {
       gemGroups.forEach((g) => {
+        const grpModels = extractGroupModels(g.description);
         g.buckets.forEach((b) => {
           const who = b.window === '5h' ? '5시간' : '주간';
-          const what = `${g.name} · ${b.window === '5h' ? '5시간 세션 한도' : '주간 공유 한도'}`;
+          const what = grpModels ? `${grpModels} (${b.window === '5h' ? '5시간' : '주간'})` : `${g.name} · ${b.window === '5h' ? '5시간 세션 한도' : '주간 공유 한도'}`;
           const color = /argon/i.test(g.name) ? '#38bdf8' : b.window === '5h' ? '#34d399' : '#60a5fa';
-          gemItems.push(limitRow(color, who, what, b.used, b.resetTime, b.windowMs));
+          gemItems.push(limitRow(color, who, what, b.used, b.resetTime, b.windowMs, null, b.disabled));
         });
       });
     } else if (L.ag.length) {
@@ -406,9 +425,11 @@
     }
     const agClaude = (L.agGroups || []).filter((g) => /claude/i.test(g.name));
     agClaude.forEach((g) => {
+      const grpModels = extractGroupModels(g.description);
       g.buckets.forEach((b) => {
         const who = b.window === '5h' ? '5시간' : '주간';
-        claudeItems.push(limitRow('#a78bfa', who, `Antigravity · ${g.name}`, b.used, b.resetTime, b.windowMs));
+        const what = grpModels ? `Antigravity · ${grpModels}` : `Antigravity · ${g.name}`;
+        claudeItems.push(limitRow('#a78bfa', who, what, b.used, b.resetTime, b.windowMs, null, b.disabled));
       });
     });
     const claudeBadgeText = !L.claude ? '확장 신호 대기' : (now - L.claude.at > STALE ? '지연됨' : '실시간 연동');
@@ -426,9 +447,11 @@
     }
     const agGpt = (L.agGroups || []).filter((g) => /gpt/i.test(g.name) && !/claude/i.test(g.name));
     agGpt.forEach((g) => {
+      const grpModels = extractGroupModels(g.description);
       g.buckets.forEach((b) => {
         const who = b.window === '5h' ? '5시간' : '주간';
-        gptItems.push(limitRow(COLOR.gpt2, who, `Antigravity · ${g.name}`, b.used, b.resetTime, b.windowMs));
+        const what = grpModels ? `Antigravity · ${grpModels}` : `Antigravity · ${g.name}`;
+        gptItems.push(limitRow(COLOR.gpt2, who, what, b.used, b.resetTime, b.windowMs, null, b.disabled));
       });
     });
     const gptBadgeText = L.gpt ? 'Codex 연동' : '기록 없음';

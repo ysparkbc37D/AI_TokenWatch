@@ -25,7 +25,7 @@
                                                                "bucketId":  "gemini-weekly",
                                                                "window":  "weekly",
                                                                "name":  "Weekly Limit Remaining",
-                                                               "left":  82.9,
+                                                               "left":  82.4,
                                                                "disabled":  false,
                                                                "resetTime":  1795220650000
                                                            },
@@ -33,7 +33,7 @@
                                                                "bucketId":  "gemini-5h",
                                                                "window":  "5h",
                                                                "name":  "Five Hour Limit Remaining",
-                                                               "left":  100,
+                                                               "left":  98.1,
                                                                "disabled":  false,
                                                                "resetTime":  1794789597000
                                                            }
@@ -57,7 +57,7 @@
                                                                "name":  "Five Hour Limit Remaining",
                                                                "left":  100,
                                                                "disabled":  true,
-                                                               "resetTime":  1794789959000
+                                                               "resetTime":  1794791803000
                                                            }
                                                        ]
                                        },
@@ -81,7 +81,7 @@
                                            "names":  [
                                                          "Gemini Models (weekly)"
                                                      ],
-                                           "left":  82.9,
+                                           "left":  82.4,
                                            "resetTime":  1795220650000,
                                            "group":  "Gemini Models",
                                            "window":  "weekly"
@@ -90,7 +90,7 @@
                                            "names":  [
                                                          "Gemini Models (5h)"
                                                      ],
-                                           "left":  100,
+                                           "left":  98.1,
                                            "resetTime":  1794789597000,
                                            "group":  "Gemini Models",
                                            "window":  "5h"
@@ -148,6 +148,6 @@
                                                     "left":  null
                                                 }
                                             ],
-                        "lastUpdated":  "2026-11-16T04:48:01.6288328+09:00"
+                        "lastUpdated":  "2026-11-16T05:17:45.9684437+09:00"
                     }
 }

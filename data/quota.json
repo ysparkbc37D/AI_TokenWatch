@@ -57,7 +57,7 @@
                                                                "name":  "Five Hour Limit Remaining",
                                                                "left":  100,
                                                                "disabled":  true,
-                                                               "resetTime":  1794876422000
+                                                               "resetTime":  1794878263000
                                                            }
                                                        ]
                                        },
@@ -121,7 +121,7 @@
                                                 },
                                                 {
                                                     "name":  "Gemini 4 Hydrogen",
-                                                    "left":  93.4
+                                                    "left":  94.3
                                                 },
                                                 {
                                                     "name":  "Orchestrator (Argon)",
@@ -129,7 +129,7 @@
                                                 },
                                                 {
                                                     "name":  "Gemini 3.8 Flash",
-                                                    "left":  93.4
+                                                    "left":  94.3
                                                 },
                                                 {
                                                     "name":  "Claude Opus 5.5",
@@ -148,6 +148,6 @@
                                                     "left":  null
                                                 }
                                             ],
-                        "lastUpdated":  "2026-11-17T04:49:05.2169042+09:00"
+                        "lastUpdated":  "2026-11-17T05:19:45.9993617+09:00"
                     }
 }

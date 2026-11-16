@@ -25,7 +25,7 @@
                                                                "bucketId":  "gemini-weekly",
                                                                "window":  "weekly",
                                                                "name":  "Weekly Limit Remaining",
-                                                               "left":  58.4,
+                                                               "left":  59.2,
                                                                "disabled":  false,
                                                                "resetTime":  1795220650000
                                                            },
@@ -57,7 +57,7 @@
                                                                "name":  "Five Hour Limit Remaining",
                                                                "left":  100,
                                                                "disabled":  true,
-                                                               "resetTime":  1794825976000
+                                                               "resetTime":  1794827822000
                                                            }
                                                        ]
                                        },
@@ -81,7 +81,7 @@
                                            "names":  [
                                                          "Gemini Models (weekly)"
                                                      ],
-                                           "left":  58.4,
+                                           "left":  59.2,
                                            "resetTime":  1795220650000,
                                            "group":  "Gemini Models",
                                            "window":  "weekly"
@@ -148,6 +148,6 @@
                                                     "left":  null
                                                 }
                                             ],
-                        "lastUpdated":  "2026-11-16T14:48:19.2043552+09:00"
+                        "lastUpdated":  "2026-11-16T15:18:01.9900199+09:00"
                     }
 }

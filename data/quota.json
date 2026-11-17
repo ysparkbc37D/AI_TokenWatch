@@ -57,7 +57,7 @@
                                                                "name":  "Five Hour Limit Remaining",
                                                                "left":  100,
                                                                "disabled":  true,
-                                                               "resetTime":  1794921311000
+                                                               "resetTime":  1794923155000
                                                            }
                                                        ]
                                        },
@@ -148,6 +148,6 @@
                                                     "left":  null
                                                 }
                                             ],
-                        "lastUpdated":  "2026-11-17T17:20:19.8786784+09:00"
+                        "lastUpdated":  "2026-11-17T17:51:03.5129667+09:00"
                     }
 }

@@ -35,7 +35,7 @@
                                                                "name":  "Five Hour Limit Remaining",
                                                                "left":  100,
                                                                "disabled":  false,
-                                                               "resetTime":  1794939446000
+                                                               "resetTime":  1794941294000
                                                            }
                                                        ]
                                        },
@@ -57,7 +57,7 @@
                                                                "name":  "Five Hour Limit Remaining",
                                                                "left":  100,
                                                                "disabled":  true,
-                                                               "resetTime":  1794939446000
+                                                               "resetTime":  1794941294000
                                                            }
                                                        ]
                                        },
@@ -91,7 +91,7 @@
                                                          "Gemini Models (5h)"
                                                      ],
                                            "left":  100,
-                                           "resetTime":  1794939446000,
+                                           "resetTime":  1794941294000,
                                            "group":  "Gemini Models",
                                            "window":  "5h"
                                        },
@@ -148,6 +148,6 @@
                                                     "left":  null
                                                 }
                                             ],
-                        "lastUpdated":  "2026-11-17T22:20:31.2154722+09:00"
+                        "lastUpdated":  "2026-11-17T22:50:17.1857978+09:00"
                     }
 }

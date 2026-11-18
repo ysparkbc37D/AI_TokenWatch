@@ -25,7 +25,7 @@
                                                                "bucketId":  "gemini-weekly",
                                                                "window":  "weekly",
                                                                "name":  "Weekly Limit Remaining",
-                                                               "left":  96.1,
+                                                               "left":  96.4,
                                                                "disabled":  false,
                                                                "resetTime":  1795567491000
                                                            },
@@ -33,7 +33,7 @@
                                                                "bucketId":  "gemini-5h",
                                                                "window":  "5h",
                                                                "name":  "Five Hour Limit Remaining",
-                                                               "left":  87.8,
+                                                               "left":  87,
                                                                "disabled":  false,
                                                                "resetTime":  1794980691000
                                                            }
@@ -49,7 +49,7 @@
                                                                "name":  "Weekly Limit Remaining",
                                                                "left":  100,
                                                                "disabled":  false,
-                                                               "resetTime":  1795571276000
+                                                               "resetTime":  1795573124000
                                                            },
                                                            {
                                                                "bucketId":  "3p-5h",
@@ -57,7 +57,7 @@
                                                                "name":  "Five Hour Limit Remaining",
                                                                "left":  100,
                                                                "disabled":  false,
-                                                               "resetTime":  1794984476000
+                                                               "resetTime":  1794986324000
                                                            }
                                                        ]
                                        },
@@ -71,7 +71,7 @@
                                                                "name":  "Gemini 4 Argon Weekly Limit",
                                                                "left":  100,
                                                                "disabled":  false,
-                                                               "resetTime":  1795571276000
+                                                               "resetTime":  1795573124000
                                                            }
                                                        ]
                                        }
@@ -81,7 +81,7 @@
                                            "names":  [
                                                          "Gemini Models (weekly)"
                                                      ],
-                                           "left":  96.1,
+                                           "left":  96.4,
                                            "resetTime":  1795567491000,
                                            "group":  "Gemini Models",
                                            "window":  "weekly"
@@ -90,7 +90,7 @@
                                            "names":  [
                                                          "Gemini Models (5h)"
                                                      ],
-                                           "left":  87.8,
+                                           "left":  87,
                                            "resetTime":  1794980691000,
                                            "group":  "Gemini Models",
                                            "window":  "5h"
@@ -100,7 +100,7 @@
                                                          "Claude and GPT models (weekly)"
                                                      ],
                                            "left":  100,
-                                           "resetTime":  1795571276000,
+                                           "resetTime":  1795573124000,
                                            "group":  "Claude and GPT models",
                                            "window":  "weekly"
                                        },
@@ -109,7 +109,7 @@
                                                          "Claude and GPT models (5h)"
                                                      ],
                                            "left":  100,
-                                           "resetTime":  1794984476000,
+                                           "resetTime":  1794986324000,
                                            "group":  "Claude and GPT models",
                                            "window":  "5h"
                                        },
@@ -118,7 +118,7 @@
                                                          "Gemini 4 Argon (weekly)"
                                                      ],
                                            "left":  100,
-                                           "resetTime":  1795571276000,
+                                           "resetTime":  1795573124000,
                                            "group":  "Gemini 4 Argon",
                                            "window":  "weekly"
                                        }
@@ -130,7 +130,7 @@
                                                 },
                                                 {
                                                     "name":  "Gemini 4 Hydrogen",
-                                                    "left":  87.8
+                                                    "left":  87
                                                 },
                                                 {
                                                     "name":  "Orchestrator (Argon)",
@@ -138,7 +138,7 @@
                                                 },
                                                 {
                                                     "name":  "Gemini 3.8 Flash",
-                                                    "left":  87.8
+                                                    "left":  87
                                                 },
                                                 {
                                                     "name":  "Claude Opus 5.5",
@@ -157,6 +157,6 @@
                                                     "left":  null
                                                 }
                                             ],
-                        "lastUpdated":  "2026-11-18T10:52:01.8965044+09:00"
+                        "lastUpdated":  "2026-11-18T11:21:47.0764646+09:00"
                     }
 }
